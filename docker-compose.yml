@@ -1,0 +1,16 @@
+version: '3.1'
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: M,u+r)]A!QGP%4s<<nyzx&RfB4yQVTGA
+      MYSQL_DATABASE: school
+      MYSQL_USER: root
+      MYSQL_PASSWORD: y@sSr[m}qb[rf(&K!HR4aL)gH}gg2y3
+    volumes:
+      - /home/mysql/db:/var/lib/mysql
+    ports:
+    # 当前宿主端口 ： 容器端口
+     - 12000:3306

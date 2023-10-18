@@ -1,0 +1,6 @@
+db:
+  mysql:
+    username: 'root_pro'
+    database: 'school'
+    password: '123456'
+    flag: 'pro'

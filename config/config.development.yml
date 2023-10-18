@@ -1,0 +1,6 @@
+db:
+  mysql:
+    username: 'root'
+    database: 'chat_room'
+    password: '123456'
+    flag: 'dev'
