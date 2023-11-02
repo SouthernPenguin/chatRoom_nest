@@ -2,3 +2,6 @@ db:
   mysql:
     host: 127.0.0.1
     prot: 3306
+JWT:
+  secret: 'fsdFSD@#$24+9*-'
+  expiresIn: '4h'

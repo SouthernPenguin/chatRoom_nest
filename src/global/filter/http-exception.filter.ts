@@ -11,7 +11,7 @@ import { Logger } from 'winston';
 import { getInfoFromReq } from 'src/global/helper/getInfoFromReq';
 
 @Catch(HttpException)
-export class HttpExceptionFilter implements ExceptionFilter {
+export class GlobalHttpExceptionFilter implements ExceptionFilter {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
@@ -25,10 +25,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       : status >= 500
       ? 'Internal server error'
       : 'Bad request';
+
     const errorResponse = {
       code: status,
       message,
       content: {},
+      success: false,
     };
 
     response.status(status);

@@ -1,26 +1,9 @@
-import * as fs from 'fs';
-import * as yaml from 'js-yaml';
-import * as path from 'path';
-import * as _ from 'lodash';
-
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
+import redConfigFile from 'src/utils/redConfigFile';
 
-// 根据不同环境读取不同配置
-const YML_CONFIG_FILE = 'config.yml';
-const YML_NODE_ENV = `config.${
-  process.env.NODE_ENV === 'development' ? 'development' : 'production'
-}.yml`;
-
-const envConfig = yaml.load(
-  fs.readFileSync(path.join('config', YML_NODE_ENV), 'utf-8'),
-);
-const config = yaml.load(
-  fs.readFileSync(path.join('config', YML_CONFIG_FILE), 'utf-8'),
-);
-// 合并配置
-const mySqlConfig: any = _.merge(config, envConfig);
+const mySqlConfig: any = redConfigFile();
 
 export const connectionParams = {
   type: 'mysql', // 数据库类型

@@ -1,22 +1,26 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import {
+  ClassSerializerInterceptor,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import 'winston-daily-rotate-file';
 import { format, transports } from 'winston';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { connectionParams } from '../ormconfig';
 import { UserModule } from './user/user.module';
-import { LoggerMiddleware } from './global/middleware/logger/logger.middleware';
-import { HttpExceptionFilter } from './global/filter/http-exception.filter';
+import { LoggerMiddleware } from './global/middleware/logger.middleware';
+import { GlobalHttpExceptionFilter } from './global/filter/http-exception.filter';
 import { TransformInterceptor } from './global/interceptor/transform.interceptor';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './global/guard/jwt.gateway';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(connectionParams),
-    UserModule,
     WinstonModule.forRoot({
       transports: [
         new transports.DailyRotateFile({
@@ -40,17 +44,27 @@ import { TransformInterceptor } from './global/interceptor/transform.interceptor
         }),
       ],
     }),
+    UserModule,
+    AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
+    // {
+    //   // JWT认证
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
     {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
     },
     {
       provide: APP_INTERCEPTOR, // 在这里注册
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalHttpExceptionFilter,
     },
   ],
 })
