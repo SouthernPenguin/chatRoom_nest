@@ -5,7 +5,7 @@ export class CreateUploadDto {
   @IsOptional()
   @ApiProperty({
     type: 'string',
-    format: 'binary',
+    format: 'format',
     example: '',
     description: '文件',
     name: 'file',
