@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { UserService } from 'src/user/user.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserAuthService } from 'src/user/userAuth.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
+    private userAuthService: UserAuthService,
     private jwtService: JwtService,
   ) {}
 
   async login(loginAuthDto: LoginAuthDto) {
-    const res = await this.userService.selectUser(loginAuthDto);
+    const res = await this.userAuthService.selectUser(loginAuthDto);
     if (!res) {
       return '账号密码错误';
     }
@@ -23,7 +23,11 @@ export class AuthService {
     };
   }
 
-  register(createAuthDto: CreateUserDto) {
-    return this.userService.create(createAuthDto);
+  async register(createAuthDto: CreateUserDto) {
+    const res = await this.userAuthService.selectUserName(createAuthDto.name);
+    if (res?.name) {
+      throw new UnauthorizedException('用户名重复');
+    }
+    return this.userAuthService.create(createAuthDto);
   }
 }

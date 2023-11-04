@@ -2,6 +2,14 @@ db:
   mysql:
     host: 127.0.0.1
     prot: 3306
+
+# JWT
 JWT:
   secret: 'fsdFSD@#$24+9*-'
   expiresIn: '4h'
+
+# 端口
+PORT: 8468
+
+# 静态文件目录
+PREFIX: '/files/'

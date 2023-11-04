@@ -17,6 +17,7 @@ import { GlobalHttpExceptionFilter } from './global/filter/http-exception.filter
 import { TransformInterceptor } from './global/interceptor/transform.interceptor';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './global/guard/jwt.gateway';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { JwtAuthGuard } from './global/guard/jwt.gateway';
     }),
     UserModule,
     AuthModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [

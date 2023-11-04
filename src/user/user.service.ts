@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UpUserPassWord } from './dto/update.userPassWord';
 import { encrypt } from 'src/utils/crypto';
-import { LoginAuthDto } from 'src/auth/dto/login-auth.dto';
+import { GetUserDto } from './dto/get-user.dto';
 
 @Injectable()
 export class UserService {
@@ -14,35 +14,68 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto);
-    user.password = encrypt(createUserDto.password);
-    return await this.userRepository.save(user);
+  async findAll(query: GetUserDto) {
+    const { page, limit, blur } = query;
+
+    const queryBuilder = await this.userRepository.createQueryBuilder('user');
+    if (blur) {
+      queryBuilder.andWhere(
+        '(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)',
+        {
+          searchQuery: `%${blur}%`,
+        },
+      );
+    }
+    const count = await queryBuilder.getCount();
+    const content = await queryBuilder
+      .skip((page - 1) * limit || 0)
+      .take(limit || 10)
+      .getMany();
+    return {
+      content,
+      totalElements: count,
+      totalPages: Number(page || 1),
+    } as unknown;
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
-  // 登录查询
-  async selectUser(loginAuthDto: LoginAuthDto) {
-    return await this.userRepository.findOne({
+  async findOne(id: number) {
+    const res = await this.userRepository.findOne({
       where: {
-        name: loginAuthDto.name,
-        password: encrypt(loginAuthDto.password),
+        id,
       },
     });
+    if (res?.id) {
+      return res;
+    }
+    throw new UnauthorizedException('用户不存在');
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const res = await this.findOne(id);
+    if (res?.id) {
+      const newRes = this.userRepository.merge(res, updateUserDto);
+      return this.userRepository.save(newRes);
+    }
+    throw new UnauthorizedException('用户不存在');
+  }
+
+  async updatePassword(id: number, updateUserDto: UpUserPassWord) {
+    const res = await this.findOne(id);
+    if (res?.id && res.password === encrypt(updateUserDto.oldPassword)) {
+      res.password = encrypt(updateUserDto.newPassword);
+      return this.userRepository.save(res);
+    }
+    if (res.password !== encrypt(updateUserDto.oldPassword)) {
+      throw new UnauthorizedException('密码不正确');
+    }
+    throw new UnauthorizedException('用户不存在');
+  }
+
+  async remove(id: number) {
+    const res = await this.findOne(id);
+    if (res?.id) {
+      return await this.userRepository.remove(res);
+    }
+    return new UnauthorizedException('学生不存在！');
   }
 }

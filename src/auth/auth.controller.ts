@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseFilters } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
@@ -16,6 +16,7 @@ export class AuthController {
   @Public()
   @Post('/login')
   @ApiOperation({ summary: '登录' })
+  @ApiBody({ type: LoginAuthDto, description: '' })
   login(@Body() loginAuthDto: LoginAuthDto) {
     return this.authService.login(loginAuthDto);
   }
@@ -23,6 +24,7 @@ export class AuthController {
   @Public()
   @Post('/register')
   @ApiOperation({ summary: '注册' })
+  @ApiBody({ type: CreateUserDto, description: '' })
   register(@Body() createAuthDto: CreateUserDto) {
     return this.authService.register(createAuthDto);
   }

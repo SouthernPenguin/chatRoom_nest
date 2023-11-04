@@ -2,11 +2,28 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import redConfigFile from './utils/redConfigFile';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('/api');
 
+  const configYml: any = redConfigFile();
+
+  //配置静态文件访问目录
+  app.useStaticAssets(join(__dirname, 'uploadFiles'), {
+    prefix: configYml.PREFIX,
+  });
+  // app.useStaticAssets(join(__dirname, '..', 'public'), {
+  //   // 配置虚拟路径
+  //   prefix: configYml.PREFIX,
+  // });
+
+  // swagger配置
   const config = new DocumentBuilder()
     .setTitle('Cats example')
     .setDescription('The cats API description')
@@ -22,6 +39,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(8468);
+  await app.listen(configYml.PORT);
 }
 bootstrap();

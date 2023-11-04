@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Length,
 } from 'class-validator';
@@ -19,6 +20,26 @@ export class CreateUserDto {
   })
   @IsNotEmpty({ groups: ['create'], message: '用户名必须填写' })
   name: string;
+
+  @IsOptional()
+  @ApiProperty({
+    example: '',
+    description: '昵称',
+    name: 'nickname',
+    required: false,
+    type: String,
+  })
+  nickname: string;
+
+  @IsOptional()
+  @ApiProperty({
+    example: '',
+    description: '头像',
+    name: 'headerImg',
+    type: String,
+    required: false,
+  })
+  headerImg: string;
 
   @IsString()
   @Length(6)
@@ -44,6 +65,7 @@ export class CreateUserDto {
     example: 0,
     name: 'gender',
     type: Number,
+    required: false,
   })
   gender: number;
 }
