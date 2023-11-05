@@ -41,7 +41,7 @@ export class UserController {
     name: 'id',
     description: '用户id',
     required: true,
-    type: String,
+    type: Number,
   })
   @ApiOperation({ summary: '用户详情' })
   findOne(@Param('id') id: number) {
@@ -55,7 +55,7 @@ export class UserController {
     name: 'id',
     description: '用户id',
     required: true,
-    type: String,
+    type: Number,
   })
   update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
@@ -69,8 +69,8 @@ export class UserController {
     type: String,
   })
   @ApiOperation({ summary: '用户删除' })
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.userService.remove(id);
   }
 
   @Post('changePassword/:id')

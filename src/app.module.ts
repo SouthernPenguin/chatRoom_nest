@@ -18,6 +18,7 @@ import { TransformInterceptor } from './global/interceptor/transform.interceptor
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './global/guard/jwt.gateway';
 import { UploadModule } from './upload/upload.module';
+import { FriendShipModule } from './friend-ship/friend-ship.module';
 
 @Module({
   imports: [
@@ -48,14 +49,15 @@ import { UploadModule } from './upload/upload.module';
     UserModule,
     AuthModule,
     UploadModule,
+    FriendShipModule,
   ],
   controllers: [],
   providers: [
-    // {
-    //   // JWT认证
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    // },
+    {
+      // JWT认证
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,

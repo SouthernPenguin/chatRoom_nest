@@ -14,7 +14,7 @@ export class AuthService {
   async login(loginAuthDto: LoginAuthDto) {
     const res = await this.userAuthService.selectUser(loginAuthDto);
     if (!res) {
-      return '账号密码错误';
+      throw new UnauthorizedException('账号密码错误');
     }
     const payload = { username: res.name, id: res.id };
     return {
