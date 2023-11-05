@@ -11,7 +11,13 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { UpUserPassWord } from './dto/update.userPassWord';
@@ -31,7 +37,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @ApiQuery({
+  @ApiParam({
     name: 'id',
     description: '用户id',
     required: true,
@@ -45,7 +51,7 @@ export class UserController {
   @Patch(':id')
   @ApiOperation({ summary: '用户更新' })
   @ApiBody({ type: UpdateUserDto, description: '' })
-  @ApiQuery({
+  @ApiParam({
     name: 'id',
     description: '用户id',
     required: true,
@@ -56,7 +62,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @ApiQuery({
+  @ApiParam({
     name: 'id',
     description: '用户id',
     required: true,
@@ -70,7 +76,7 @@ export class UserController {
   @Post('changePassword/:id')
   @ApiOperation({ summary: '修改密码' })
   @ApiBody({ type: UpUserPassWord, description: '' })
-  @ApiQuery({
+  @ApiParam({
     name: 'id',
     description: '用户id',
     required: true,

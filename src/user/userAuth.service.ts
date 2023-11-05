@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { LoginAuthDto } from 'src/auth/dto/login-auth.dto';
 import { encrypt } from 'src/utils/crypto';
@@ -34,6 +34,15 @@ export class UserAuthService {
     return await this.userRepository.findOne({
       where: {
         name: userName,
+      },
+    });
+  }
+
+  // 批量查询用户
+  async selectAllUser(id: number[]) {
+    return await this.userRepository.find({
+      where: {
+        id: In(id),
       },
     });
   }
