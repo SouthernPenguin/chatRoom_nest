@@ -6,19 +6,25 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ comment: '用户名', nullable: true, length: 30, unique: true })
+  @Column({
+    type: 'varchar',
+    comment: '用户名',
+    nullable: true,
+    length: 30,
+    unique: true,
+  })
   name: string;
 
-  @Column({ comment: '昵称', length: 30 })
+  @Column({ type: 'varchar', comment: '昵称', length: 30 })
   nickname: string;
 
-  @Column({ comment: '头像' })
+  @Column({ type: 'varchar', comment: '头像' })
   headerImg: string;
 
-  @Column({ comment: '密码', nullable: true, length: 50 })
+  @Column({ type: 'varchar', comment: '密码', nullable: true, length: 50 })
   @Exclude()
   password: string;
 
-  @Column({ comment: '性别' })
+  @Column({ type: 'int', comment: '性别' })
   gender: number;
 }
