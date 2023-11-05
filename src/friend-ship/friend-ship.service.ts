@@ -52,6 +52,7 @@ export class FriendShipService {
     }
 
     const res = await this.friendShipRepository.create(createFriendShipDto);
+    res.createdTime = new Date();
     return this.friendShipRepository.save(res);
   }
 
@@ -84,6 +85,16 @@ export class FriendShipService {
     } else {
       return '好友列表为空';
     }
+  }
+
+  async findAllFriend() {
+    const res = await this.friendShipRepository.find();
+    res.forEach((item) => {
+      if (item.createdTime) {
+        item.createdTime = new Date(item.createdTime).toLocaleString() as any;
+      }
+    });
+    return res;
   }
 
   // 判断是否为好友

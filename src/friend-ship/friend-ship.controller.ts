@@ -23,9 +23,15 @@ interface FindFriend {
 
 @Controller('friend-ship')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
-@ApiTags('好友')
+@ApiTags('好友关系模块')
 export class FriendShipController {
   constructor(private readonly friendShipService: FriendShipService) {}
+
+  // 获取添加分页
+  @Get('/list')
+  allFriends() {
+    return this.friendShipService.findAllFriend();
+  }
 
   @Post()
   @ApiOperation({ summary: '添加好友' })

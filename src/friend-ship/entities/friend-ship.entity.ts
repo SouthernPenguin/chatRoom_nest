@@ -1,3 +1,4 @@
+// 好友关系列表
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
 @Entity()
@@ -17,4 +18,7 @@ export class FriendShip {
 
   @Column({ type: 'boolean', default: true })
   state: boolean;
+
+  @Column({ type: 'datetime', nullable: true })
+  createdTime: Date;
 }
