@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber } from 'class-validator';
+import { FriendShipEnum } from 'src/enum';
 
 export class CreateFriendShipDto {
   // 后面直接从token中获取
@@ -24,5 +25,5 @@ export class CreateFriendShipDto {
   friendId: number;
 
   sortedKey: string;
-  state: boolean;
+  state: FriendShipEnum;
 }

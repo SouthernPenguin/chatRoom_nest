@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FriendShip } from './entities/friend-ship.entity';
 import { Repository } from 'typeorm';
 import { DeleteUserDto } from './dto/delete-friend-ship.dto';
+import { FriendShipEnum } from 'src/enum';
 
 @Injectable()
 export class FriendShipService {
@@ -16,6 +17,21 @@ export class FriendShipService {
 
   async selectUser(name: string) {
     return await this.userAuthService.selectUserName(name);
+  }
+
+  async selectAwaitFriend(id: number) {
+    const res = await this.friendShipRepository.find({
+      where: {
+        userId: id,
+        state: FriendShipEnum.发起,
+      },
+    });
+    const list = await this.userAuthService.selectAllUser(
+      res.map((item) => item.friendId),
+    );
+    return {
+      content: list,
+    };
   }
 
   async addUser(createFriendShipDto: CreateFriendShipDto) {
@@ -32,21 +48,21 @@ export class FriendShipService {
       createFriendShipDto.userId,
       createFriendShipDto.friendId,
     );
-    if (friend && friend?.id && friend.state) {
+    if (friend && friend?.id && friend.state == FriendShipEnum.通过) {
       throw new UnauthorizedException('已经是好友关系');
     }
 
     // 更新好友状态
-    if (friend && !friend.state) {
+    if (friend && friend.state == FriendShipEnum.发起) {
       const res = await this.friendShipRepository
         .createQueryBuilder('friend_ship')
         .update(FriendShip)
-        .set({ state: true })
+        .set({ state: FriendShipEnum.通过 })
         .where('id = :id', { id: friend.id })
         .execute();
 
       if (res.affected > 0) {
-        friend.state = true;
+        friend.state = FriendShipEnum.通过;
         return friend;
       }
     }
@@ -64,7 +80,7 @@ export class FriendShipService {
     if (!friend?.id) {
       throw new UnauthorizedException('不是好友关系');
     }
-    friend.state = false;
+    friend.state = FriendShipEnum.发起;
 
     return this.friendShipRepository.save(friend);
   }

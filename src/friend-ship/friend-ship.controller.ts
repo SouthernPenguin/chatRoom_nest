@@ -28,13 +28,19 @@ export class FriendShipController {
   constructor(private readonly friendShipService: FriendShipService) {}
 
   // 获取添加分页
-  @Get('/list')
-  allFriends() {
-    return this.friendShipService.findAllFriend();
+  // @Get('/list')
+  // allFriends() {
+  //   return this.friendShipService.findAllFriend();
+  // }
+
+  @Get('/awaitFriend')
+  @ApiOperation({ summary: '等待通过好友列表' })
+  awaitPassFriend(@Req() req: Request) {
+    return this.friendShipService.selectAwaitFriend(req['user']['id']);
   }
 
   @Post()
-  @ApiOperation({ summary: '添加好友' })
+  @ApiOperation({ summary: '添加好友/通过好友' })
   @ApiQuery({ type: CreateFriendShipDto, description: '' })
   create(
     @Body(CreatedFriendShipPipe) createFriendShipDto: CreateFriendShipDto,
