@@ -68,7 +68,6 @@ export class FriendShipService {
     }
 
     const res = await this.friendShipRepository.create(createFriendShipDto);
-    res.createdTime = new Date();
     return this.friendShipRepository.save(res);
   }
 

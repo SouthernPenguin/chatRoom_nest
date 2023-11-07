@@ -1,6 +1,12 @@
 // 好友关系列表
 import { FriendShipEnum } from 'src/enum';
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity()
 @Index(['userId', 'friendId', 'sortedKey'], { unique: true })
@@ -30,6 +36,6 @@ export class FriendShip {
   })
   state: FriendShipEnum;
 
-  @Column({ type: 'datetime', nullable: true, comment: '创建时间' })
+  @CreateDateColumn()
   createdTime: Date;
 }
