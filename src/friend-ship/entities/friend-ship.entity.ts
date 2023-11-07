@@ -8,13 +8,18 @@ export class FriendShip {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, comment: '自己id' })
   userId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, comment: '对方id' })
   friendId: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    comment: '自己id + 对方id',
+  })
   sortedKey: string;
 
   @Column({
@@ -25,6 +30,6 @@ export class FriendShip {
   })
   state: FriendShipEnum;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'datetime', nullable: true, comment: '创建时间' })
   createdTime: Date;
 }
