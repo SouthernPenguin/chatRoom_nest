@@ -36,6 +36,6 @@ export class FriendShip {
   })
   state: FriendShipEnum;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   createdTime: Date;
 }

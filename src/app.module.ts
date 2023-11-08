@@ -19,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './global/guard/jwt.gateway';
 import { UploadModule } from './upload/upload.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -50,14 +51,15 @@ import { FriendShipModule } from './friend-ship/friend-ship.module';
     AuthModule,
     UploadModule,
     FriendShipModule,
+    MessageModule,
   ],
   controllers: [],
   providers: [
-    {
-      // JWT认证
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
+    // {
+    //   // JWT认证
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,

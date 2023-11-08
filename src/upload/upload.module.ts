@@ -6,10 +6,12 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { UserModule } from 'src/user/user.module';
+import { MessageModule } from 'src/message/message.module';
 
 @Module({
   imports: [
     UserModule,
+    MessageModule,
     MulterModule.register({
       storage: diskStorage({
         // 指定文件存储目录
