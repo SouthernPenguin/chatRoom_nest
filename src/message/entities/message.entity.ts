@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+// 消息
 @Entity()
 export class Message {
   @PrimaryGeneratedColumn()

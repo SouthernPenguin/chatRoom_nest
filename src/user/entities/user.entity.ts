@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+// 用户
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()

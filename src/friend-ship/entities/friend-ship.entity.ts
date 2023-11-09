@@ -1,4 +1,3 @@
-// 好友关系列表
 import { FriendShipEnum } from 'src/enum';
 import {
   Entity,
@@ -8,6 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
+// 好友关系列表
 @Entity()
 @Index(['userId', 'friendId', 'sortedKey'], { unique: true })
 export class FriendShip {
