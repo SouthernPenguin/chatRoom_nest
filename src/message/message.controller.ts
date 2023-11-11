@@ -23,18 +23,40 @@ import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { ListInterceptorsInterceptor } from './interceptors/list-interceptors.interceptor';
 import { MessageEnum } from 'src/enum';
+import { WsGateway } from 'src/ws/ws.gateway';
 
 @Controller('message')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
 @ApiTags('私聊')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly ws: WsGateway,
+  ) {}
 
   @Post()
-  @ApiOperation({ summary: '发送信息' })
+  @ApiOperation({
+    summary:
+      '发送信息, 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
+  })
   @ApiBody({ type: CreateMessageDto, description: '' })
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messageService.create(createMessageDto);
+  async create(@Body() createMessageDto: CreateMessageDto) {
+    const res = await this.messageService.create(createMessageDto);
+    // id从请求头获取
+    this.ws.server.emit(
+      'activeUserNoticeList',
+      await this.messageService.getNewNotice(1),
+    );
+
+    // 聊天记录
+    this.ws.server.emit(
+      'activeTowUsers',
+      await this.findAll({
+        fromUserId: createMessageDto.fromUserId,
+        toUserId: createMessageDto.toUserId,
+      } as ListMessageDto),
+    );
+    return res;
   }
 
   @Get()

@@ -21,16 +21,17 @@ export class NotificationService {
         this.update(res.id, createDto);
       } else {
         const res = await this.notificationService.create(createDto);
-        this.notificationService.save(res);
+        await this.notificationService.save(res);
       }
     } catch (error) {
       throw new ServiceUnavailableException(error.message);
     }
   }
 
+  // 当前用户消息列表
   async findOne(id: number) {
     try {
-      return await this.notificationService
+      const res = await this.notificationService
         .createQueryBuilder('notice')
         .where(
           '(notice.fromUserId = :id or notice.toUserId = :id) and state != :state',
@@ -43,6 +44,7 @@ export class NotificationService {
         .leftJoinAndSelect('notice.toUser', 'toUser')
         .leftJoinAndSelect('notice.fromUser', 'fromUser')
         .getMany();
+      return res;
     } catch (error) {
       throw new ServiceUnavailableException(error);
     }
@@ -81,18 +83,14 @@ export class NotificationService {
 
   // 查找双方最新记录
   async isFriend(userId: number, friendId: number) {
+    const slqStr =
+      '(notice.toUserId = :userId and notice.fromUserId = :friendId) or (notice.toUserId = :friendId and notice.fromUserId = :userId)';
     const res = await this.notificationService
       .createQueryBuilder('notice')
-      .where(
-        `
-        (notice.toUserId = :userId and notice.fromUserId = :friendId) 
-        or 
-        (notice.fromUserId = :friendId and notice.toUserId = :userId)`,
-        {
-          userId,
-          friendId,
-        },
-      )
+      .where(slqStr, {
+        userId,
+        friendId,
+      })
       .getOne();
     return res;
   }

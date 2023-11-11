@@ -21,6 +21,7 @@ import { UploadModule } from './upload/upload.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
 import { MessageModule } from './message/message.module';
 import { NotificationModule } from './notification/notification.module';
+import { WsModule } from './ws/ws.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { NotificationModule } from './notification/notification.module';
     FriendShipModule,
     MessageModule,
     NotificationModule,
+    WsModule,
   ],
   controllers: [],
   providers: [

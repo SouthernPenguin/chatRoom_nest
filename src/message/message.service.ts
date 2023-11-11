@@ -29,6 +29,11 @@ export class MessageService {
     }
   }
 
+  // 当前用户消息列表;
+  async getNewNotice(id: number) {
+    return await this.notificationService.findOne(id);
+  }
+
   async findAll(listMessageDto: ListMessageDto) {
     const { page, limit } = listMessageDto;
     const queryBuilder = this.messageRepository
