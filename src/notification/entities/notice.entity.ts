@@ -10,9 +10,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+// 通知表
 @Entity()
 @Index(['toUserId', 'fromUserId'], { unique: true })
-export class Chatroom {
+export class Notice {
   @PrimaryGeneratedColumn()
   id: number;
 

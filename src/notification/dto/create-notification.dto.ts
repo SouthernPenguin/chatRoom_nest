@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateChatroomDto {
+export class CreateDto {
   @IsString()
   @IsNotEmpty({ message: '内容不能为空' })
   newMessage: string;

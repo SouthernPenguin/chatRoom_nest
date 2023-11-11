@@ -5,14 +5,14 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from './entities/message.entity';
 import { ListMessageDto } from './dto/list-message.dto';
 import { MessageEnum } from 'src/enum';
-import { ChatroomService } from 'src/chatroom/chatroom.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
-    private chatRoomService: ChatroomService,
+    private notificationService: NotificationService,
   ) {}
 
   async create(createMessageDto: CreateMessageDto) {
@@ -20,7 +20,7 @@ export class MessageService {
 
     const res = await this.messageRepository.save(resCreate);
     if (res?.id) {
-      await this.chatRoomService.create({
+      await this.notificationService.create({
         newMessage: res.postMessage,
         fromUserId: res.fromUserId,
         toUserId: res.toUserId,
