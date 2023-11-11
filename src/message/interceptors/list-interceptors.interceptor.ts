@@ -13,6 +13,15 @@ export class ListInterceptorsInterceptor implements NestInterceptor {
     if (typeof t == 'object') {
       t.fromUserId = Number(t.fromUserId);
       t.toUserId = Number(t.toUserId);
+      if (t.createdTime.length > 0) {
+        if (t.createdTime[0] == '' || t.createdTime[1] == '') {
+          t.createdTime = [];
+        }
+      }
+
+      if (t.createdTime == '') {
+        t.createdTime = [];
+      }
     }
 
     return next.handle();

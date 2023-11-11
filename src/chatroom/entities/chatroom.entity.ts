@@ -2,24 +2,22 @@ import { MessageEnum } from 'src/enum';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
-  CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
-// 消息
 @Entity()
-export class Message {
+@Index(['toUserId', 'fromUserId'], { unique: true })
+export class Chatroom {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ comment: '文件类型', type: 'text', nullable: true })
-  fileType: string;
-
-  @Column({ comment: '聊天内容', type: 'text', nullable: true })
-  postMessage: string;
+  @UpdateDateColumn({ comment: '更新时间' })
+  updateTime: Date;
 
   @Column({
     comment: '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
@@ -29,8 +27,12 @@ export class Message {
   })
   state: MessageEnum;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdTime: Date;
+  @Column({
+    type: 'text',
+    comment: '最新的信息',
+    name: 'newMessage',
+  })
+  newMessage: string;
 
   @Column({
     type: 'int',
@@ -55,15 +57,4 @@ export class Message {
   @ManyToOne(() => User, (user) => user.id, { eager: true })
   @JoinColumn({ name: 'toUserId' })
   toUser: User;
-
-  // @Column({
-  //   comment: '记录谁删除信息',
-  //   type: 'number',
-  //   nullable: true,
-  // })
-  // fromUserDelId: number;
-  // // 外键
-  // @ManyToOne(() => User, (user) => user.id, { eager: true })
-  // @JoinColumn({ name: 'fromUserDelId' })
-  // fromDel: User;
 }

@@ -20,6 +20,7 @@ import { JwtAuthGuard } from './global/guard/jwt.gateway';
 import { UploadModule } from './upload/upload.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
 import { MessageModule } from './message/message.module';
+import { ChatroomModule } from './chatroom/chatroom.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MessageModule } from './message/message.module';
     UploadModule,
     FriendShipModule,
     MessageModule,
+    ChatroomModule,
   ],
   controllers: [],
   providers: [

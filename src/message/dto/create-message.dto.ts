@@ -37,12 +37,14 @@ export class CreateMessageDto {
     example: '',
     description: '文件类型',
     name: 'fileType',
+    type: String,
   })
   @IsOptional()
-  fileType: MessageEnum;
+  fileType: string;
 
   @ApiProperty({
     example: '',
+    enum: MessageEnum,
     description: '未读:UNREAD/已读:READ/撤回:WITHDRAW/删除:DELETE',
     name: 'toUserId',
   })

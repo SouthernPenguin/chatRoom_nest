@@ -7,7 +7,6 @@ import {
   UseFilters,
   UseInterceptors,
   Param,
-  Delete,
 } from '@nestjs/common';
 import {
   ApiBody,

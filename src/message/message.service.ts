@@ -5,17 +5,28 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from './entities/message.entity';
 import { ListMessageDto } from './dto/list-message.dto';
 import { MessageEnum } from 'src/enum';
+import { ChatroomService } from 'src/chatroom/chatroom.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
+    private chatRoomService: ChatroomService,
   ) {}
 
   async create(createMessageDto: CreateMessageDto) {
     const resCreate = await this.messageRepository.create(createMessageDto);
-    return this.messageRepository.save(resCreate);
+
+    const res = await this.messageRepository.save(resCreate);
+    if (res?.id) {
+      await this.chatRoomService.create({
+        newMessage: res.postMessage,
+        fromUserId: res.fromUserId,
+        toUserId: res.toUserId,
+      });
+      return res;
+    }
   }
 
   async findAll(listMessageDto: ListMessageDto) {
@@ -43,6 +54,7 @@ export class MessageService {
         toUserId: listMessageDto.fromUserId,
         fromUserId: listMessageDto.toUserId,
       })
+      .orderBy('message.createdTime', 'DESC')
       .leftJoinAndSelect('message.toUser', 'toUser') // 关联的实体属性，别名
       .leftJoinAndSelect('message.fromUser', 'fromUser');
 
