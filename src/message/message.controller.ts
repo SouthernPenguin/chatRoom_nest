@@ -7,6 +7,7 @@ import {
   UseFilters,
   UseInterceptors,
   Param,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -24,7 +25,7 @@ import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { ListInterceptorsInterceptor } from './interceptors/list-interceptors.interceptor';
 import { MessageEnum } from 'src/enum';
 import { WsGateway } from 'src/ws/ws.gateway';
-
+import { getTokenUser } from 'src/utils';
 @Controller('message')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
 @ApiTags('私聊')
@@ -40,13 +41,14 @@ export class MessageController {
       '发送信息, 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
   })
   @ApiBody({ type: CreateMessageDto, description: '' })
-  async create(@Body() createMessageDto: CreateMessageDto) {
+  async create(
+    @Req() req: Request,
+    @Body() createMessageDto: CreateMessageDto,
+  ) {
     const res = await this.messageService.create(createMessageDto);
-    // id从请求头获取
-    this.ws.server.emit(
-      'activeUserNoticeList',
-      await this.messageService.getNewNotice(1),
-    );
+    const currentUser = await getTokenUser(req); // 当前用户
+    const r = await this.messageService.getNewNotice(currentUser?.id);
+    this.ws.server.emit('activeUserNoticeList', r);
 
     // 聊天记录
     this.ws.server.emit(

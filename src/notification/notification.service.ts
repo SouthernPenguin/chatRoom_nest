@@ -16,7 +16,10 @@ export class NotificationService {
   // 创建聊天列表
   async create(createDto: CreateDto) {
     try {
-      const res = await this.isFriend(createDto.fromUserId, createDto.toUserId);
+      const res = await this.bothNotice(
+        createDto.fromUserId,
+        createDto.toUserId,
+      );
       if (res?.id) {
         this.update(res.id, createDto);
       } else {
@@ -82,7 +85,7 @@ export class NotificationService {
   }
 
   // 查找双方最新记录
-  async isFriend(userId: number, friendId: number) {
+  async bothNotice(userId: number, friendId: number) {
     const slqStr =
       '(notice.toUserId = :userId and notice.fromUserId = :friendId) or (notice.toUserId = :friendId and notice.fromUserId = :userId)';
     const res = await this.notificationService

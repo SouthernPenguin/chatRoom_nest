@@ -5,12 +5,14 @@ import {
   Param,
   Patch,
   Query,
+  Req,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MessageEnum } from 'src/enum';
 import { NotificationService } from './notification.service';
+import { getTokenUser } from 'src/utils';
 
 @Controller('notice')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
@@ -18,16 +20,11 @@ import { NotificationService } from './notification.service';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Get(':id')
+  @Get()
   @ApiOperation({ summary: '当前用户消息列表' })
-  @ApiParam({
-    name: 'id',
-    description: '信息id',
-    required: true,
-    type: Number,
-  })
-  findOne(@Param('id') id: number) {
-    return this.notificationService.findOne(id);
+  async findOne(@Req() req: Request) {
+    const currentUser = await getTokenUser(req); // 当前用户
+    return this.notificationService.findOne(currentUser.id);
   }
 
   @Patch(':id')

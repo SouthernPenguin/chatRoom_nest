@@ -67,6 +67,7 @@ export class FriendShipService {
       }
     }
 
+    // 创建好友
     const res = await this.friendShipRepository.create(createFriendShipDto);
     return this.friendShipRepository.save(res);
   }

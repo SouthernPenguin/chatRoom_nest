@@ -9,7 +9,9 @@ import redConfigFile from './utils/redConfigFile';
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+  });
   app.setGlobalPrefix('/api');
 
   const configYml: any = redConfigFile();

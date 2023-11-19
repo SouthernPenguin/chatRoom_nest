@@ -59,11 +59,11 @@ import { WsModule } from './ws/ws.module';
   ],
   controllers: [],
   providers: [
-    // {
-    //   // JWT认证
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    // },
+    {
+      // JWT认证
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,

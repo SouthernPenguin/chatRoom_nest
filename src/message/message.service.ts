@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -6,6 +6,7 @@ import { Message } from './entities/message.entity';
 import { ListMessageDto } from './dto/list-message.dto';
 import { MessageEnum } from 'src/enum';
 import { NotificationService } from 'src/notification/notification.service';
+import { FriendShipService } from 'src/friend-ship/friend-ship.service';
 
 @Injectable()
 export class MessageService {
@@ -13,9 +14,18 @@ export class MessageService {
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
     private notificationService: NotificationService,
+    private friendShipService: FriendShipService,
   ) {}
 
   async create(createMessageDto: CreateMessageDto) {
+    const isFriend = await this.friendShipService.isFriend(
+      createMessageDto.toUserId,
+      createMessageDto.fromUserId,
+    );
+    if (!isFriend?.id) {
+      throw new UnauthorizedException('不是好友关系无法发送消息');
+    }
+
     const resCreate = await this.messageRepository.create(createMessageDto);
 
     const res = await this.messageRepository.save(resCreate);
@@ -59,7 +69,7 @@ export class MessageService {
         toUserId: listMessageDto.fromUserId,
         fromUserId: listMessageDto.toUserId,
       })
-      .orderBy('message.createdTime', 'DESC')
+      .orderBy('message.createdTime', 'ASC')
       .leftJoinAndSelect('message.toUser', 'toUser') // 关联的实体属性，别名
       .leftJoinAndSelect('message.fromUser', 'fromUser');
 
