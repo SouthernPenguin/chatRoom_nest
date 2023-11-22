@@ -33,6 +33,12 @@ export class FriendShipController {
   //   return this.friendShipService.findAllFriend();
   // }
 
+  @Get('/list')
+  @ApiOperation({ summary: '用户好友列表' })
+  userFriends(@Req() req: Request) {
+    return this.friendShipService.selectUserFriend(req['user']['id']);
+  }
+
   @Get('/awaitFriend')
   @ApiOperation({ summary: '等待通过好友列表' })
   awaitPassFriend(@Req() req: Request) {
@@ -65,17 +71,5 @@ export class FriendShipController {
   @ApiOperation({ summary: '查找好友' })
   findFriend(@Query() query: FindFriend) {
     return this.friendShipService.selectUser(query.name);
-  }
-
-  @Get(':id')
-  @ApiParam({
-    name: 'id',
-    description: '用户id',
-    required: true,
-    type: Number,
-  })
-  @ApiOperation({ summary: '用户好友列表' })
-  userFriends(@Param('id') id: number) {
-    return this.friendShipService.selectUserFriend(id);
   }
 }
