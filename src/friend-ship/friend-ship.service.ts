@@ -84,16 +84,26 @@ export class FriendShipService {
 
     return this.friendShipRepository.save(friend);
   }
+  z;
 
   async selectUserFriend(id: number) {
-    const allFriends = await this.friendShipRepository.find({
-      where: {
+    const allFriends = await this.friendShipRepository
+      .createQueryBuilder('friend_ship')
+      .where('friend_ship.userId = :userId or friend_ship.friendId = :userId', {
         userId: id,
-      },
-    });
+      })
+      .getMany();
+
     if (allFriends.length) {
       const res = await this.userAuthService.selectAllUser(
-        allFriends.map((item) => item.friendId),
+        allFriends.map((item) => {
+          if (item.friendId == id) {
+            return item.userId;
+          }
+          if (item.userId == id) {
+            return item.friendId;
+          }
+        }),
       );
       return {
         content: res,

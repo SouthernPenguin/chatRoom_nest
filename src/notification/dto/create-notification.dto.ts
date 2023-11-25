@@ -3,8 +3,8 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateDto {
   @IsString()
-  @IsNotEmpty({ message: '内容不能为空' })
-  newMessage: string;
+  // @IsNotEmpty({ message: '内容不能为空' })
+  newMessage: string | null | undefined;
 
   @IsNotEmpty({ message: '发送者id' })
   @IsNumber()

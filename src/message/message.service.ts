@@ -48,7 +48,8 @@ export class MessageService {
     const { page, limit } = listMessageDto;
     const queryBuilder = this.messageRepository
       .createQueryBuilder('message')
-      .where('message.state != :state', { state: MessageEnum.撤回 });
+      .where('message.state != :state', { state: MessageEnum.撤回 })
+      .andWhere("message.postMessage  <> null or message.postMessage <> '' ");
 
     if (listMessageDto.createdTime && listMessageDto.createdTime.length) {
       queryBuilder.andWhere(

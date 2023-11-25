@@ -32,6 +32,7 @@ export class Notice {
     type: 'text',
     comment: '最新的信息',
     name: 'newMessage',
+    nullable: true,
   })
   newMessage: string;
 

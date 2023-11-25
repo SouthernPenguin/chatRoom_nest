@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { MessageEnum } from 'src/enum';
 
 export class CreateMessageDto {
-  @IsNotEmpty({ message: '内容不能为空' })
+  // @IsNotEmpty({ message: '内容不能为空' })
   @IsString()
   @ApiProperty({
     example: '',
