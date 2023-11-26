@@ -6,6 +6,8 @@ import {
   Patch,
   Query,
   Req,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
@@ -13,12 +15,30 @@ import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MessageEnum } from 'src/enum';
 import { NotificationService } from './notification.service';
 import { getTokenUser } from 'src/utils';
+import { CreateDto } from './dto/create-notification.dto';
+import { WsGateway } from 'src/ws/ws.gateway';
 
 @Controller('notice')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
 @ApiTags('消息列表')
 export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) {}
+  constructor(
+    private readonly notificationService: NotificationService,
+    private readonly ws: WsGateway,
+  ) {}
+
+  @Post()
+  @ApiOperation({ summary: '想聊天' })
+  async wantMessage(@Req() req: Request, @Body() createMessageDto: CreateDto) {
+    await this.notificationService.create({
+      newMessage: createMessageDto.newMessage,
+      fromUserId: createMessageDto.fromUserId,
+      toUserId: createMessageDto.toUserId,
+    });
+    const currentUser = await getTokenUser(req); // 当前用户
+    const r = await await this.notificationService.findOne(currentUser?.id);
+    this.ws.server.emit('activeUserNoticeList', r);
+  }
 
   @Get()
   @ApiOperation({ summary: '当前用户消息列表' })

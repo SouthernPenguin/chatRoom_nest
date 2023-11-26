@@ -4,6 +4,12 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class CreateDto {
   @IsString()
   // @IsNotEmpty({ message: '内容不能为空' })
+  @ApiProperty({
+    example: '',
+    description: '发送消息',
+    name: 'newMessage',
+    type: String,
+  })
   newMessage: string | null | undefined;
 
   @IsNotEmpty({ message: '发送者id' })
