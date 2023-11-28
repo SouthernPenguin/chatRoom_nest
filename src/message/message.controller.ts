@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   Param,
   Req,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -26,6 +27,7 @@ import { ListInterceptorsInterceptor } from './interceptors/list-interceptors.in
 import { MessageEnum } from 'src/enum';
 import { WsGateway } from 'src/ws/ws.gateway';
 import { getTokenUser } from 'src/utils';
+import { ChangeMessageState } from './dto/change-message-state';
 @Controller('message')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
 @ApiTags('私聊')
@@ -69,27 +71,62 @@ export class MessageController {
     return await this.messageService.findAll(listMessageDto);
   }
 
-  @Get(':id')
+  @Post(':id')
   @ApiOperation({ summary: '撤销信息' })
+  @ApiBody({ type: ChangeMessageState, description: '' })
   @ApiParam({
     name: 'id',
     description: '信息id',
     required: true,
     type: Number,
   })
-  findOne(@Param('id') id: number) {
-    return this.messageService.changeMessageState(id, MessageEnum.撤回);
+  async backMsg(
+    @Param('id') id: number,
+    @Body() changeMessageState: ChangeMessageState,
+  ) {
+    const res = await this.messageService.changeMessageState(
+      id,
+      MessageEnum.撤回,
+    );
+    // 聊天记录
+    this.ws.server.emit(
+      'activeTowUsers',
+      await this.findAll({
+        fromUserId: changeMessageState.fromUserId,
+        toUserId: changeMessageState.toUserId,
+      } as ListMessageDto),
+    );
+
+    return res;
   }
 
-  // @Delete(':id')
-  // @ApiOperation({ summary: '删除信息' })
-  // @ApiParam({
-  //   name: 'id',
-  //   description: '信息id',
-  //   required: true,
-  //   type: Number,
-  // })
-  // remove(@Param('id') id: number) {
-  //   return this.messageService.changeMessageState(id, MessageEnum.删除);
-  // }
+  @Delete(':id')
+  @ApiOperation({ summary: '删除信息' })
+  @ApiBody({ type: ChangeMessageState, description: '' })
+  @ApiParam({
+    name: 'id',
+    description: '信息id',
+    required: true,
+    type: Number,
+  })
+  @ApiBody({ type: ChangeMessageState, description: '' })
+  async remove(
+    @Param('id') id: number,
+    @Body() changeMessageState: ChangeMessageState,
+  ) {
+    const res = await this.messageService.changeMessageState(
+      id,
+      MessageEnum.删除,
+    );
+
+    // 聊天记录
+    this.ws.server.emit(
+      'activeTowUsers',
+      await this.findAll({
+        fromUserId: changeMessageState.fromUserId,
+        toUserId: changeMessageState.toUserId,
+      } as ListMessageDto),
+    );
+    return res;
+  }
 }

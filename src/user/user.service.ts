@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -47,7 +47,7 @@ export class UserService {
     if (res?.id) {
       return res;
     }
-    throw new UnauthorizedException('用户不存在');
+    throw new BadRequestException('用户不存在');
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -56,7 +56,7 @@ export class UserService {
       const newRes = this.userRepository.merge(res, updateUserDto);
       return this.userRepository.save(newRes);
     }
-    throw new UnauthorizedException('用户不存在');
+    throw new BadRequestException('用户不存在');
   }
 
   async updatePassword(id: number, updateUserDto: UpUserPassWord) {
@@ -66,9 +66,9 @@ export class UserService {
       return this.userRepository.save(res);
     }
     if (res.password !== encrypt(updateUserDto.oldPassword)) {
-      throw new UnauthorizedException('密码不正确');
+      throw new BadRequestException('密码不正确');
     }
-    throw new UnauthorizedException('用户不存在');
+    throw new BadRequestException('用户不存在');
   }
 
   async remove(id: number) {
@@ -76,6 +76,6 @@ export class UserService {
     if (res?.id) {
       return await this.userRepository.remove(res);
     }
-    return new UnauthorizedException('学生不存在！');
+    return new BadRequestException('学生不存在！');
   }
 }

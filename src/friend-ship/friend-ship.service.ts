@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { UserAuthService } from 'src/user/userAuth.service';
 import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -41,7 +41,7 @@ export class FriendShipService {
     ]);
 
     if (allUsers.length < 2) {
-      throw new UnauthorizedException('好友不存在');
+      throw new BadRequestException('好友不存在');
     }
 
     const friend = await this.isFriend(
@@ -49,7 +49,7 @@ export class FriendShipService {
       createFriendShipDto.friendId,
     );
     if (friend && friend?.id && friend.state == FriendShipEnum.通过) {
-      throw new UnauthorizedException('已经是好友关系');
+      throw new BadRequestException('已经是好友关系');
     }
 
     // 更新好友状态
@@ -78,7 +78,7 @@ export class FriendShipService {
       deleteUserDto.friendId,
     );
     if (!friend?.id) {
-      throw new UnauthorizedException('不是好友关系');
+      throw new BadRequestException('不是好友关系');
     }
     friend.state = FriendShipEnum.发起;
 

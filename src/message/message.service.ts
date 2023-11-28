@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -23,7 +23,7 @@ export class MessageService {
       createMessageDto.fromUserId,
     );
     if (!isFriend?.id) {
-      throw new UnauthorizedException('不是好友关系无法发送消息');
+      throw new BadRequestException('不是好友关系无法发送消息');
     }
 
     const resCreate = await this.messageRepository.create(createMessageDto);
@@ -48,8 +48,7 @@ export class MessageService {
     const { page, limit } = listMessageDto;
     const queryBuilder = this.messageRepository
       .createQueryBuilder('message')
-      .where('message.state != :state', { state: MessageEnum.撤回 })
-      .andWhere("message.postMessage  <> null or message.postMessage <> '' ");
+      .where('message.state  <> :state', { state: MessageEnum.撤回 });
 
     if (listMessageDto.createdTime && listMessageDto.createdTime.length) {
       queryBuilder.andWhere(
@@ -62,14 +61,13 @@ export class MessageService {
     }
 
     queryBuilder
-      .andWhere({
-        fromUserId: listMessageDto.fromUserId,
-        toUserId: listMessageDto.toUserId,
-      })
-      .orWhere({
-        toUserId: listMessageDto.fromUserId,
-        fromUserId: listMessageDto.toUserId,
-      })
+      .andWhere(
+        '((message.fromUserId = :fromUserId and message.toUserId= :toUserId) or (message.toUserId= :fromUserId and message.fromUserId = :toUserId))',
+        {
+          fromUserId: listMessageDto.fromUserId,
+          toUserId: listMessageDto.toUserId,
+        },
+      )
       .orderBy('message.createdTime', 'ASC')
       .leftJoinAndSelect('message.toUser', 'toUser') // 关联的实体属性，别名
       .leftJoinAndSelect('message.fromUser', 'fromUser');
@@ -100,7 +98,7 @@ export class MessageService {
       const nowTime = new Date().getTime();
       const resultTime = nowTime - createdTime;
       if (new Date(resultTime).getMinutes() > 3) {
-        return '时间超过了3分钟无法撤回';
+        throw new BadRequestException('时间超过了3分钟无法撤回'); // return '';
       }
 
       const withdraw = await this.messageRepository

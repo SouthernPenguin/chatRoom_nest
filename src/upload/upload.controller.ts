@@ -3,7 +3,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
-  UnauthorizedException,
+  BadRequestException,
   Query,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
@@ -11,7 +11,6 @@ import { UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { CreateUploadDto } from './dto/create-upload.dto';
-import { UpLoadEnum } from 'src/enum';
 
 @Controller('upload')
 @ApiTags('文件上传')
@@ -34,10 +33,10 @@ export class UploadController {
   ) {
     const imgTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
     if (!imgTypes.includes(file.mimetype)) {
-      throw new UnauthorizedException('请上传图片');
+      throw new BadRequestException('请上传图片');
     }
     if (typeof id == 'undefined') {
-      throw new UnauthorizedException('用户不存在');
+      throw new BadRequestException('用户不存在');
     }
     this.uploadService.upLoadUserImageSave(id, file);
   }
