@@ -27,7 +27,7 @@ export class UploadService {
     fromUserId: number,
     file: Express.Multer.File,
   ) {
-    const postMessage = `${configYml.PREFIX}${file.filename}`;
+    const postMessage = `http://127.0.0.1:${configYml.PORT}/${configYml.PREFIX}${file.filename}`;
     const dto = {
       postMessage,
       fromUserId,

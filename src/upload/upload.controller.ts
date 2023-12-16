@@ -11,11 +11,18 @@ import { UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { CreateUploadDto } from './dto/create-upload.dto';
+import { WsGateway } from 'src/ws/ws.gateway';
+import { MessageService } from 'src/message/message.service';
+import { ListMessageDto } from 'src/message/dto/list-message.dto';
 
 @Controller('upload')
 @ApiTags('文件上传')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly messageService: MessageService,
+    private readonly ws: WsGateway,
+  ) {}
 
   @ApiOperation({ summary: '用户头像上传' })
   @ApiBody({ type: CreateUploadDto, description: '' })
@@ -57,11 +64,19 @@ export class UploadController {
   })
   @Post('/upLoadMessage')
   @UseInterceptors(FileInterceptor('file')) // UseInterceptors 处理文件的中间件，file是一个标识名
-  upLoadMessage(
+  async upLoadMessage(
     @Query('fromUserId') fromUserId: number,
     @Query('toUserId') toUserId: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    this.uploadService.messageFileSave(toUserId, fromUserId, file);
+    await this.uploadService.messageFileSave(toUserId, fromUserId, file);
+    // 聊天记录
+    this.ws.server.emit(
+      'activeTowUsers',
+      await this.messageService.findAll({
+        fromUserId,
+        toUserId,
+      } as ListMessageDto),
+    );
   }
 }

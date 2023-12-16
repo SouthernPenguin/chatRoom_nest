@@ -22,6 +22,7 @@ import { FriendShipModule } from './friend-ship/friend-ship.module';
 import { MessageModule } from './message/message.module';
 import { NotificationModule } from './notification/notification.module';
 import { WsModule } from './ws/ws.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { WsModule } from './ws/ws.module';
     MessageModule,
     NotificationModule,
     WsModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [

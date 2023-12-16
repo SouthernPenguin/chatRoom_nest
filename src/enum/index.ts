@@ -19,3 +19,9 @@ export enum UpLoadEnum {
   用户头像 = 'IMAGE_HEARD',
   聊天信息 = 'MESSAGE_FILE',
 }
+
+// 文件来源
+export enum FilesSource {
+  私聊 = 'ONE_FOR_ONE',
+  群聊 = 'MANY_TO_MANY',
+}
