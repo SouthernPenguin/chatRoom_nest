@@ -78,4 +78,20 @@ export class UserService {
     }
     return new BadRequestException('学生不存在！');
   }
+
+  async selectUser(id: number, name: string) {
+    const queryBuilder = await this.userRepository.createQueryBuilder('user');
+
+    return await queryBuilder
+      .where(
+        '(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)  ',
+        {
+          searchQuery: `%${name}%`,
+        },
+      )
+      .andWhere(' (user.id <> :id)', {
+        id: id,
+      })
+      .getMany();
+  }
 }

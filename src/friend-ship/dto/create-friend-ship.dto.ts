@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { FriendShipEnum } from 'src/enum';
 
 export class CreateFriendShipDto {
@@ -23,6 +23,35 @@ export class CreateFriendShipDto {
     type: String,
   })
   friendId: number;
+
+  @IsNotEmpty({ message: '发送者id' })
+  @IsNumber()
+  @ApiProperty({
+    example: '',
+    description: '发送者id',
+    name: 'fromUserId',
+    type: Number,
+  })
+  fromUserId: number;
+
+  @IsNotEmpty({ message: '接收者id' })
+  @IsNumber()
+  @ApiProperty({
+    example: '',
+    description: '接收者id',
+    name: 'toUserId',
+    type: Number,
+  })
+  toUserId: number;
+
+  @ApiProperty({
+    example: '',
+    description: '备注',
+    name: 'notes',
+    type: String,
+  })
+  @IsOptional()
+  notes: string;
 
   sortedKey: string;
   state: FriendShipEnum;

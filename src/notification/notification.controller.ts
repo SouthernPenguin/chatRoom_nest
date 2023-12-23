@@ -28,7 +28,10 @@ export class NotificationController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: '想聊天' })
+  @ApiOperation({
+    summary:
+      '想聊天 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
+  })
   async wantMessage(@Req() req: Request, @Body() createMessageDto: CreateDto) {
     await this.notificationService.create({
       newMessage: createMessageDto.newMessage,

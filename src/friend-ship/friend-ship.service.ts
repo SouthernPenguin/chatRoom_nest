@@ -4,94 +4,85 @@ import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendShip } from './entities/friend-ship.entity';
 import { Repository } from 'typeorm';
-import { DeleteUserDto } from './dto/delete-friend-ship.dto';
 import { FriendShipEnum } from 'src/enum';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class FriendShipService {
   constructor(
     private userAuthService: UserAuthService,
+    private userService: UserService,
     @InjectRepository(FriendShip)
     private friendShipRepository: Repository<FriendShip>,
   ) {}
 
-  async selectUser(name: string) {
-    return await this.userAuthService.selectUserName(name);
+  async selectUser(id: number, name: string) {
+    return await this.userService.selectUser(id, name);
   }
 
-  async selectAwaitFriend(id: number) {
+  async selectAwaitFriend(toUserId: number) {
     const res = await this.friendShipRepository.find({
       where: {
-        userId: id,
-        state: FriendShipEnum.发起,
+        toUserId,
+        // state: FriendShipEnum.发起,
       },
     });
-    const list = await this.userAuthService.selectAllUser(
-      res.map((item) => item.friendId),
-    );
     return {
-      content: list,
+      content: res,
     };
   }
 
-  async addUser(createFriendShipDto: CreateFriendShipDto) {
+  async addUser(id: number, createFriendShipDto: CreateFriendShipDto) {
     const allUsers = await this.userAuthService.selectAllUser([
       createFriendShipDto.friendId,
       createFriendShipDto.userId,
     ]);
 
     if (allUsers.length < 2) {
-      throw new BadRequestException('好友不存在');
+      throw new BadRequestException('用户不存在');
     }
 
     const friend = await this.isFriend(
       createFriendShipDto.userId,
       createFriendShipDto.friendId,
     );
+
+    if (id === createFriendShipDto.fromUserId && friend && friend?.id) {
+      throw new BadRequestException('已发起好友请求，请等待对方通过');
+    }
+
     if (friend && friend?.id && friend.state == FriendShipEnum.通过) {
       throw new BadRequestException('已经是好友关系');
     }
 
-    // 更新好友状态
-    if (friend && friend.state == FriendShipEnum.发起) {
-      const res = await this.friendShipRepository
-        .createQueryBuilder('friend_ship')
-        .update(FriendShip)
-        .set({ state: FriendShipEnum.通过 })
-        .where('id = :id', { id: friend.id })
-        .execute();
-
-      if (res.affected > 0) {
-        friend.state = FriendShipEnum.通过;
-        return friend;
-      }
-    }
-
     // 创建好友
-    const res = await this.friendShipRepository.create(createFriendShipDto);
+    const res = await this.friendShipRepository.create({
+      ...createFriendShipDto,
+      notes: createFriendShipDto.notes,
+    });
     return this.friendShipRepository.save(res);
   }
 
-  async deleteUser(deleteUserDto: DeleteUserDto) {
-    const friend = await this.isFriend(
-      deleteUserDto.userId,
-      deleteUserDto.friendId,
-    );
-    if (!friend?.id) {
-      throw new BadRequestException('不是好友关系');
-    }
-    friend.state = FriendShipEnum.发起;
-
-    return this.friendShipRepository.save(friend);
+  async upUserState(id: number, type: FriendShipEnum) {
+    const res = await this.friendShipRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    res.state = type;
+    return this.friendShipRepository.save(res);
   }
-  z;
 
   async selectUserFriend(id: number) {
     const allFriends = await this.friendShipRepository
       .createQueryBuilder('friend_ship')
-      .where('friend_ship.userId = :userId or friend_ship.friendId = :userId', {
-        userId: id,
-      })
+      .where(
+        '(friend_ship.userId = :userId or friend_ship.friendId = :userId) and friend_ship.state <> :state',
+        {
+          userId: id,
+          state: FriendShipEnum.发起,
+        },
+      )
       .getMany();
 
     if (allFriends.length) {
@@ -109,7 +100,9 @@ export class FriendShipService {
         content: res,
       };
     } else {
-      return '好友列表为空';
+      return {
+        content: [],
+      };
     }
   }
 

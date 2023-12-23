@@ -4,18 +4,26 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
   UseFilters,
 } from '@nestjs/common';
 import { FriendShipService } from './friend-ship.service';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
 import { CreatedFriendShipPipe } from './pipe/created-friend-ship.pipe';
-import { DeleteUserDto } from './dto/delete-friend-ship.dto';
+import { WsGateway } from 'src/ws/ws.gateway';
+import { FriendShipEnum } from 'src/enum';
 
 interface FindFriend {
   name: string;
@@ -25,7 +33,10 @@ interface FindFriend {
 @UseFilters(HttpExceptionFilter, TypeormFilter)
 @ApiTags('好友关系模块')
 export class FriendShipController {
-  constructor(private readonly friendShipService: FriendShipService) {}
+  constructor(
+    private readonly friendShipService: FriendShipService,
+    private readonly ws: WsGateway,
+  ) {}
 
   // 获取添加分页
   // @Get('/list')
@@ -46,19 +57,50 @@ export class FriendShipController {
   }
 
   @Post()
-  @ApiOperation({ summary: '添加好友/通过好友' })
-  @ApiQuery({ type: CreateFriendShipDto, description: '' })
-  create(
+  @ApiOperation({
+    summary: '添加好友 前端socket对应名称：awaitFriend(等待通过好友列表) ',
+  })
+  @ApiBody({ type: CreateFriendShipDto, description: '' })
+  async create(
+    @Req() req: Request,
     @Body(CreatedFriendShipPipe) createFriendShipDto: CreateFriendShipDto,
   ) {
-    return this.friendShipService.addUser(createFriendShipDto);
+    const res = await this.friendShipService.addUser(
+      req['user']['id'],
+      createFriendShipDto,
+    );
+
+    const ss = await this.friendShipService.selectAwaitFriend(
+      createFriendShipDto.toUserId,
+    );
+    if (res.state === FriendShipEnum.发起) {
+      this.ws.server.emit('awaitFriend', ss);
+    }
+    return res;
   }
 
-  @Delete()
+  @Patch('/:id')
+  @ApiOperation({ summary: '通过好友' })
+  @ApiParam({
+    name: 'id',
+    description: 'id',
+    required: true,
+    type: Number,
+  })
+  async passCreated(@Param('id') id: number) {
+    return this.friendShipService.upUserState(id, FriendShipEnum.通过);
+  }
+
+  @Delete('/:id')
   @ApiOperation({ summary: '删除好友' })
-  @ApiQuery({ type: DeleteUserDto, description: '' })
-  deleteFriend(@Body() deleteUserDto: DeleteUserDto) {
-    return this.friendShipService.deleteUser(deleteUserDto);
+  @ApiParam({
+    name: 'id',
+    description: '当前记录id',
+    required: true,
+    type: Number,
+  })
+  deleteFriend(@Param('id') id: number) {
+    return this.friendShipService.upUserState(id, FriendShipEnum.删除);
   }
 
   @Get()
@@ -69,7 +111,12 @@ export class FriendShipController {
     type: String,
   })
   @ApiOperation({ summary: '查找好友' })
-  findFriend(@Query() query: FindFriend) {
-    return this.friendShipService.selectUser(query.name);
+  async findFriend(@Req() req: Request, @Query() query: FindFriend) {
+    return {
+      content: await this.friendShipService.selectUser(
+        req['user']['id'],
+        query.name,
+      ),
+    };
   }
 }
