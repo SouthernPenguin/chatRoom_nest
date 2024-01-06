@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { MessageService } from 'src/message/message.service';
 import { UserService } from 'src/user/user.service';
+import { formatFileSize } from 'src/utils';
 import redConfigFile from 'src/utils/redConfigFile';
 
 const configYml: any = redConfigFile();
@@ -33,6 +34,7 @@ export class UploadService {
       fromUserId,
       toUserId,
       fileType: file.filename.split('.')[file.filename.split('.').length - 1],
+      fileSize: formatFileSize(file.size),
     } as CreateMessageDto;
 
     return await this.messageService.create(dto);

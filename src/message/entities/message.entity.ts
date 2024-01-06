@@ -18,6 +18,9 @@ export class Message {
   @Column({ comment: '文件类型', type: 'text', nullable: true })
   fileType: string;
 
+  @Column({ comment: '文件大小', type: 'text', nullable: true })
+  fileSize: string;
+
   @Column({ comment: '聊天内容', type: 'text', nullable: true })
   postMessage: string;
 

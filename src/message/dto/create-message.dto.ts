@@ -33,14 +33,17 @@ export class CreateMessageDto {
   })
   toUserId: number;
 
-  @ApiProperty({
-    example: '',
-    description: '文件类型',
-    name: 'fileType',
-    type: String,
-  })
+  // @ApiProperty({
+  //   example: '',
+  //   description: '文件类型',
+  //   name: 'fileType',
+  //   type: String,
+  // })
   @IsOptional()
   fileType: string;
+
+  @IsOptional()
+  fileSize: string;
 
   @ApiProperty({
     example: '',

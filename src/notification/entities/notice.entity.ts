@@ -17,6 +17,12 @@ export class Notice {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ comment: '未读消息条数' })
+  toUserUnreadNumber: number;
+
+  @Column({ comment: '未读消息条数' })
+  fromUserUnreadNumber: number;
+
   @UpdateDateColumn({ comment: '更新时间' })
   updateTime: Date;
 

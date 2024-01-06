@@ -31,7 +31,9 @@ export class MessageService {
     const res = await this.messageRepository.save(resCreate);
     if (res?.id) {
       await this.notificationService.create({
-        newMessage: res.postMessage,
+        newMessage: res.fileSize
+          ? res.postMessage.split('files/')[1]
+          : res.postMessage,
         fromUserId: res.fromUserId,
         toUserId: res.toUserId,
       });

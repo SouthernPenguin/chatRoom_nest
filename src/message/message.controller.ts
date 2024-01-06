@@ -49,6 +49,7 @@ export class MessageController {
   ) {
     const res = await this.messageService.create(createMessageDto);
     const currentUser = await getTokenUser(req); // 当前用户
+    // 通知
     const r = await this.messageService.getNewNotice(currentUser?.id);
     this.ws.server.emit('activeUserNoticeList', r);
 
