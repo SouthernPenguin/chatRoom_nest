@@ -1,4 +1,5 @@
-import { MessageEnum } from 'src/enum';
+import { ChatType, MessageEnum } from 'src/enum';
+import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -17,11 +18,19 @@ export class Notice {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ comment: '未读消息条数' })
-  toUserUnreadNumber: number;
+  // @Column({ comment: '未读消息条数' })
+  // toUserUnreadNumber: number;
 
-  @Column({ comment: '未读消息条数' })
-  fromUserUnreadNumber: number;
+  // @Column({ comment: '未读消息条数' })
+  // fromUserUnreadNumber: number;
+
+  @Column({
+    comment: '私聊=ONE_FOR_ONE 群聊=MANY_TO_MANY',
+    type: 'enum',
+    enum: ChatType,
+    default: ChatType.私聊,
+  })
+  msgType: ChatType;
 
   @UpdateDateColumn({ comment: '更新时间' })
   updateTime: Date;
@@ -65,4 +74,16 @@ export class Notice {
   @ManyToOne(() => User, (user) => user.id, { eager: true })
   @JoinColumn({ name: 'toUserId' })
   toUser: User;
+
+  @Column({
+    type: 'int',
+    comment: '群id/同时是接收者id',
+    name: 'groupId',
+    nullable: true,
+  })
+  groupId: number;
+  // 外键
+  @ManyToOne(() => GroupChat, (groupChat) => groupChat.id, { eager: true })
+  @JoinColumn({ name: 'groupId' })
+  toUsers: GroupChat;
 }

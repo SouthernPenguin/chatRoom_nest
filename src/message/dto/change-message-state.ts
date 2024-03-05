@@ -7,4 +7,5 @@ export class ChangeMessageState extends OmitType(CreateMessageDto, [
   'state',
   'fileType',
   'createdTime',
+  'msgType',
 ]) {}

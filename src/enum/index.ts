@@ -25,3 +25,9 @@ export enum FilesSource {
   私聊 = 'ONE_FOR_ONE',
   群聊 = 'MANY_TO_MANY',
 }
+
+// 聊天类型
+export enum ChatType {
+  私聊 = 'ONE_FOR_ONE',
+  群聊 = 'MANY_TO_MANY',
+}

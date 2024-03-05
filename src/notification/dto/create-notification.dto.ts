@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ChatType } from 'src/enum';
 
 export class CreateDto {
   @IsString()
@@ -22,13 +29,32 @@ export class CreateDto {
   })
   fromUserId: number;
 
-  @IsNotEmpty({ message: '接收者id' })
+  // @IsNotEmpty({ message: '接收者id' })
   @IsNumber()
   @ApiProperty({
     example: '',
     description: '接收者id',
     name: 'toUserId',
-    type: Number,
+    // type: Number,
   })
-  toUserId: number;
+  toUserId?: any;
+
+  // @IsNotEmpty({ message: '接收者id' })
+  // @IsNumber()
+  @IsOptional()
+  @ApiProperty({
+    example: '',
+    description: '接收者id',
+    name: 'groupId',
+    // type: String || ,
+  })
+  groupId?: any;
+
+  @IsEnum(ChatType)
+  @ApiProperty({
+    example: '',
+    description: '私聊=ONE_FOR_ONE 群聊=MANY_TO_MANY',
+    name: 'msgType',
+  })
+  msgType: ChatType;
 }

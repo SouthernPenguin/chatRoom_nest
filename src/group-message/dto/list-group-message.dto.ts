@@ -1,13 +1,7 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { CreateMessageDto } from './create-message.dto';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsOptional } from 'class-validator';
 
-export class ListMessageDto extends OmitType(CreateMessageDto, [
-  'postMessage',
-  'state',
-  'fileType',
-  'msgType',
-]) {
+export class ListGroupMessageDto {
   @ApiProperty({ example: '1', description: '页码', required: true })
   @IsOptional()
   page: number;

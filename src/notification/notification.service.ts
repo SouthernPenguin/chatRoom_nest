@@ -1,30 +1,47 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateDto } from './dto/create-notification.dto';
-import { MessageEnum } from 'src/enum';
+import { ChatType, MessageEnum } from 'src/enum';
 import { Notice } from './entities/notice.entity';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notice)
     private notificationService: Repository<Notice>,
+    @InjectRepository(GroupChatUser)
+    private groupChatUserService: Repository<GroupChatUser>,
+
+    private readonly entityManager: EntityManager,
   ) {}
 
   // 创建聊天列表
   async create(createDto: CreateDto) {
     try {
-      const res = await this.bothNotice(
-        createDto.fromUserId,
-        createDto.toUserId,
-      );
-      if (res?.id) {
-        this.update(res.id, createDto);
-      } else {
-        const res = await this.notificationService.create(createDto);
-        await this.notificationService.save(res);
+      if (createDto.msgType === ChatType.私聊) {
+        const res = await this.bothNotice(
+          createDto.fromUserId,
+          createDto.toUserId,
+        );
+        if (res?.id) {
+          this.update(res.id, createDto);
+        } else {
+          const res = await this.notificationService.create(createDto);
+          await this.notificationService.save(res);
+        }
+      }
+
+      if (createDto.msgType === ChatType.群聊) {
+        const res = await this.chatNotice(createDto.groupId);
+        if (res?.id) {
+          this.update(res.id, createDto);
+        } else {
+          const res = await this.notificationService.create(createDto);
+          await this.notificationService.save(res);
+        }
       }
     } catch (error) {
       throw new ServiceUnavailableException(error.message);
@@ -36,6 +53,10 @@ export class NotificationService {
     try {
       const res = await this.notificationService
         .createQueryBuilder('notice')
+        .addOrderBy('updateTime', 'DESC')
+        .leftJoinAndSelect('notice.toUser', 'toUser')
+        .leftJoinAndSelect('notice.fromUser', 'fromUser')
+        .leftJoinAndSelect('notice.toUsers', 'toUsers')
         .where(
           '(notice.fromUserId = :id or notice.toUserId = :id) and state != :state',
           {
@@ -43,9 +64,9 @@ export class NotificationService {
             state: 'DELETE',
           },
         )
-        .addOrderBy('updateTime', 'DESC')
-        .leftJoinAndSelect('notice.toUser', 'toUser')
-        .leftJoinAndSelect('notice.fromUser', 'fromUser')
+        .orWhere(
+          'notice.fromUserId IN ( SELECT userId FROM group_chat_user WHERE group_chat_user.groupChatId = notice.groupId ) ',
+        )
         .getMany();
       return res;
     } catch (error) {
@@ -96,5 +117,13 @@ export class NotificationService {
       })
       .getOne();
     return res;
+  }
+
+  async chatNotice(groupId: number) {
+    return await this.notificationService.findOne({
+      where: {
+        groupId,
+      },
+    });
   }
 }

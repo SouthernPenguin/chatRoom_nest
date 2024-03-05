@@ -23,6 +23,8 @@ import { MessageModule } from './message/message.module';
 import { NotificationModule } from './notification/notification.module';
 import { WsModule } from './ws/ws.module';
 import { FilesModule } from './files/files.module';
+import { GroupChatModule } from './group-chat/group-chat.module';
+import { GroupMessageModule } from './group-message/group-message.module';
 
 @Module({
   imports: [
@@ -58,6 +60,8 @@ import { FilesModule } from './files/files.module';
     NotificationModule,
     WsModule,
     FilesModule,
+    GroupChatModule,
+    GroupMessageModule,
   ],
   controllers: [],
   providers: [

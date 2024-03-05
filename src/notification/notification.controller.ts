@@ -12,7 +12,7 @@ import {
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { MessageEnum } from 'src/enum';
+import { ChatType, MessageEnum } from 'src/enum';
 import { NotificationService } from './notification.service';
 import { getTokenUser } from 'src/utils';
 import { CreateDto } from './dto/create-notification.dto';
@@ -36,7 +36,14 @@ export class NotificationController {
     await this.notificationService.create({
       newMessage: createMessageDto.newMessage,
       fromUserId: createMessageDto.fromUserId,
-      toUserId: createMessageDto.toUserId,
+      toUserId: (createMessageDto.msgType === ChatType.群聊
+        ? null
+        : createMessageDto.toUserId) as any,
+      groupId:
+        createMessageDto.msgType === ChatType.群聊
+          ? createMessageDto.toUserId
+          : null,
+      msgType: createMessageDto.msgType,
     });
     const currentUser = await getTokenUser(req); // 当前用户
     const r = await await this.notificationService.findOne(currentUser?.id);

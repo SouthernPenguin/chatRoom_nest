@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { MessageEnum } from 'src/enum';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ChatType, MessageEnum } from 'src/enum';
 
 export class CreateMessageDto {
   // @IsNotEmpty({ message: '内容不能为空' })
@@ -60,4 +66,13 @@ export class CreateMessageDto {
   })
   @IsOptional()
   createdTime: Date;
+
+  @IsEnum(ChatType)
+  @ApiProperty({
+    example: '',
+    description: '私聊=ONE_FOR_ONE 群聊=MANY_TO_MANY',
+    name: 'msgType',
+    type: 'enum',
+  })
+  msgType: ChatType;
 }

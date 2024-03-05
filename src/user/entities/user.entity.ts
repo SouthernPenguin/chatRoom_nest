@@ -1,5 +1,12 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 // 用户
 @Entity()
 export class User {
@@ -27,4 +34,10 @@ export class User {
 
   @Column({ type: 'int', comment: '性别' })
   gender: number;
+
+  @ManyToMany(() => GroupChat, (groupChat) => groupChat.users)
+  groupChats: GroupChat[];
+
+  @OneToMany(() => GroupChat, (groupChat) => groupChat.createdUserId)
+  groupChatUsers: GroupChat[];
 }

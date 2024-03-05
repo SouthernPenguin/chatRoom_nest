@@ -36,6 +36,7 @@ export class MessageService {
           : res.postMessage,
         fromUserId: res.fromUserId,
         toUserId: res.toUserId,
+        msgType: createMessageDto.msgType,
       });
       return res;
     }

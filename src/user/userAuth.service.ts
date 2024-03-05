@@ -38,7 +38,7 @@ export class UserAuthService {
     });
   }
 
-  // 批量查询用户
+  // 批量查询用户，可用于放回实体集合
   async selectAllUser(id: number[]) {
     return await this.userRepository.find({
       where: {

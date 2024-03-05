@@ -14,6 +14,8 @@ import { CreateUploadDto } from './dto/create-upload.dto';
 import { WsGateway } from 'src/ws/ws.gateway';
 import { MessageService } from 'src/message/message.service';
 import { ListMessageDto } from 'src/message/dto/list-message.dto';
+import { ChatType } from 'src/enum';
+import { GroupMessageService } from 'src/group-message/group-message.service';
 
 @Controller('upload')
 @ApiTags('文件上传')
@@ -21,6 +23,8 @@ export class UploadController {
   constructor(
     private readonly uploadService: UploadService,
     private readonly messageService: MessageService,
+    private readonly groupMessageService: GroupMessageService,
+
     private readonly ws: WsGateway,
   ) {}
 
@@ -67,16 +71,44 @@ export class UploadController {
   async upLoadMessage(
     @Query('fromUserId') fromUserId: number,
     @Query('toUserId') toUserId: number,
+    @Query('msgType') msgType: ChatType,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    await this.uploadService.messageFileSave(toUserId, fromUserId, file);
-    // 聊天记录
-    this.ws.server.emit(
-      'activeTowUsers',
-      await this.messageService.findAll({
-        fromUserId,
-        toUserId,
-      } as ListMessageDto),
+    await this.uploadService.messageFileSave(
+      toUserId,
+      fromUserId,
+      file,
+      msgType,
     );
+    if (msgType === ChatType.私聊) {
+      // 通知
+      const r = await this.messageService.getNewNotice(fromUserId);
+      this.ws.server.emit('activeUserNoticeList', r);
+
+      // 聊天记录
+      this.ws.server.emit(
+        'activeTowUsers',
+        await this.messageService.findAll({
+          fromUserId,
+          toUserId,
+        } as ListMessageDto),
+      );
+    }
+
+    if (msgType === ChatType.群聊) {
+      // 通知
+      const r = await this.groupMessageService.getNewNotice(toUserId);
+      this.ws.server.emit('activeUserNoticeList', r);
+
+      // 聊天记录
+      this.ws.server.emit(
+        'activeTowUsers',
+        await this.groupMessageService.findAll(toUserId, {
+          page: 1,
+          limit: 10,
+          createdTime: [],
+        }),
+      );
+    }
   }
 }

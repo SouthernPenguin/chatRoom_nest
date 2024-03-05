@@ -8,9 +8,11 @@ import * as path from 'path';
 import { UserModule } from 'src/user/user.module';
 import { MessageModule } from 'src/message/message.module';
 import { WsModule } from 'src/ws/ws.module';
+import { GroupMessageModule } from 'src/group-message/group-message.module';
 
 @Module({
   imports: [
+    GroupMessageModule,
     WsModule,
     UserModule,
     MessageModule,
