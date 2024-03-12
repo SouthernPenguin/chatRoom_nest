@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 05/03/2024 20:39:34
+ Date: 12/03/2024 09:37:00
 */
 
 SET NAMES utf8mb4;
@@ -50,6 +50,7 @@ CREATE TABLE `friend_ship`  (
   `fromUserId` int(11) NULL DEFAULT NULL COMMENT '发送者(ID)',
   `toUserId` int(11) NULL DEFAULT NULL COMMENT '接收者(ID)',
   `notes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '备注',
+  `messageNumber` int(11) NULL DEFAULT NULL COMMENT '消息数量',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `IDX_26df3e1d8b7428b9d601194839`(`userId` ASC, `friendId` ASC, `sortedKey` ASC) USING BTREE,
   INDEX `FK_7dfc010217195c6bc513a387b5d`(`fromUserId` ASC) USING BTREE,
@@ -61,10 +62,10 @@ CREATE TABLE `friend_ship`  (
 -- ----------------------------
 -- Records of friend_ship
 -- ----------------------------
-INSERT INTO `friend_ship` VALUES (35, 6, 1, '6-1', 'PASS', '2023-12-17 07:37:39.992965', 6, 1, 'minim culpa');
-INSERT INTO `friend_ship` VALUES (47, 1, 8, '1-8', 'PASS', '2023-12-23 08:08:40.628162', 1, 8, 'sdsad');
-INSERT INTO `friend_ship` VALUES (48, 1, 7, '1-7', 'PASS', '2023-12-24 13:17:53.655104', 1, 7, '333');
-INSERT INTO `friend_ship` VALUES (49, 8, 7, '8-7', 'PASS', '2024-02-27 12:51:42.990254', 8, 7, 'ts');
+INSERT INTO `friend_ship` VALUES (35, 6, 1, '6-1', 'PASS', '2023-12-17 07:37:39.992965', 6, 1, 'minim culpa', NULL);
+INSERT INTO `friend_ship` VALUES (47, 1, 8, '1-8', 'PASS', '2023-12-23 08:08:40.628162', 1, 8, 'sdsad', NULL);
+INSERT INTO `friend_ship` VALUES (48, 1, 7, '1-7', 'PASS', '2023-12-24 13:17:53.655104', 1, 7, '333', NULL);
+INSERT INTO `friend_ship` VALUES (49, 8, 7, '8-7', 'PASS', '2024-02-27 12:51:42.990254', 8, 7, 'ts', NULL);
 
 -- ----------------------------
 -- Table structure for group_chat
@@ -97,6 +98,7 @@ CREATE TABLE `group_chat_user`  (
   `groupChatId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `isSpeak` tinyint(4) NULL DEFAULT 0 COMMENT '是否禁言',
+  `messageNumber` int(11) NULL DEFAULT NULL COMMENT '消息数量',
   PRIMARY KEY (`groupChatId`, `userId`) USING BTREE,
   INDEX `IDX_6821d5492eb83f7e48d0fe124e`(`groupChatId` ASC) USING BTREE,
   INDEX `IDX_cd628a8651b7ff01b752a3638b`(`userId` ASC) USING BTREE,
@@ -107,19 +109,19 @@ CREATE TABLE `group_chat_user`  (
 -- ----------------------------
 -- Records of group_chat_user
 -- ----------------------------
-INSERT INTO `group_chat_user` VALUES (3, 6, 0);
-INSERT INTO `group_chat_user` VALUES (3, 7, 0);
-INSERT INTO `group_chat_user` VALUES (3, 8, 0);
-INSERT INTO `group_chat_user` VALUES (4, 1, 0);
-INSERT INTO `group_chat_user` VALUES (4, 6, 0);
-INSERT INTO `group_chat_user` VALUES (4, 7, 0);
-INSERT INTO `group_chat_user` VALUES (4, 8, 0);
-INSERT INTO `group_chat_user` VALUES (5, 7, 0);
-INSERT INTO `group_chat_user` VALUES (5, 22, 0);
-INSERT INTO `group_chat_user` VALUES (7, 7, 0);
-INSERT INTO `group_chat_user` VALUES (7, 21, 0);
-INSERT INTO `group_chat_user` VALUES (7, 22, 0);
-INSERT INTO `group_chat_user` VALUES (10, 20, 0);
+INSERT INTO `group_chat_user` VALUES (3, 6, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (3, 7, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (3, 8, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (4, 1, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (4, 6, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (4, 7, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (4, 8, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (5, 7, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (5, 22, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (7, 7, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (7, 21, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (7, 22, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (10, 20, 0, NULL);
 
 -- ----------------------------
 -- Table structure for group_message
