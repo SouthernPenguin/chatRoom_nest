@@ -66,6 +66,20 @@ export class FriendShip {
   @Column({ type: 'varchar', nullable: true, comment: '备注' })
   notes: string;
 
+  @Column({
+    type: 'int',
+    nullable: true,
+    comment: '自己发送给对方，对方未读信息数量',
+  })
+  userMsgNumber: number;
+
+  @Column({
+    type: 'int',
+    nullable: true,
+    comment: '对方发给我，我这边未读信息数量',
+  })
+  friendMsgNumber: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdTime: Date;
 }

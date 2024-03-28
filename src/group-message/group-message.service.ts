@@ -15,10 +15,11 @@ export class GroupMessageService {
     private groupMessageRepository: Repository<GroupMessage>,
     private groupChatService: GroupChatUserService,
     private notificationService: NotificationService,
+    private groupChatUserService: GroupChatUserService,
   ) {}
 
   async create(createGroupMessageDto: CreateGroupMessageDto) {
-    const isUser = await this.groupChatService.selectUser(
+    const isUser = await this.groupChatUserService.selectUser(
       createGroupMessageDto.fromUserId,
     );
     if (!isUser) {
@@ -26,6 +27,18 @@ export class GroupMessageService {
     }
     const res = await this.groupMessageRepository.create(createGroupMessageDto);
     const returnRes = await this.groupMessageRepository.save(res);
+
+    const r = await this.groupMessageRepository
+      .createQueryBuilder('group-message')
+      .select('count(*) as msgNumber')
+      .where('groupId = :groupId', { groupId: createGroupMessageDto.groupId })
+      .andWhere('group-message.state = :state', { state: MessageEnum.未读 })
+      .getRawOne();
+
+    await this.groupChatUserService.updateMsgNumber(
+      createGroupMessageDto.groupId,
+      r.msgNumber,
+    );
 
     if (returnRes?.id) {
       await this.notificationService.create({
@@ -59,11 +72,11 @@ export class GroupMessageService {
 
     queryBuilder
       .andWhere('group-message.groupId = :id', { id })
-      .orderBy('group-message.createdTime', 'ASC')
       .leftJoinAndSelect('group-message.fromUser', 'fromUserId');
 
     const count = await queryBuilder.getCount();
     const content = await queryBuilder
+      .orderBy('group-message.createdTime', 'DESC')
       .skip((page - 1) * limit || 0)
       .take(limit || 10)
       .getMany();

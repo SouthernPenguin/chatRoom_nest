@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import {
   Column,
@@ -38,6 +39,6 @@ export class User {
   @ManyToMany(() => GroupChat, (groupChat) => groupChat.users)
   groupChats: GroupChat[];
 
-  @OneToMany(() => GroupChat, (groupChat) => groupChat.createdUserId)
-  groupChatUsers: GroupChat[];
+  // @OneToMany(() => GroupChatUser, (userBusinessLine) => userBusinessLine.user)
+  // groupChatUser: GroupChatUser[];
 }

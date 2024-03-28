@@ -26,6 +26,7 @@ export class CreateGroupMessageDto {
   fileSize: string;
 
   @IsOptional()
+  @IsNotEmpty({ message: '发收者id' })
   fromUserId: number;
 
   @IsNotEmpty({ message: '接收者id' })

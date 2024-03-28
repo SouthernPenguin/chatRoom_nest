@@ -1,11 +1,12 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateDto } from './dto/create-notification.dto';
 import { ChatType, MessageEnum } from 'src/enum';
 import { Notice } from './entities/notice.entity';
 import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { FriendShipService } from 'src/friend-ship/friend-ship.service';
 
 @Injectable()
 export class NotificationService {
@@ -15,7 +16,7 @@ export class NotificationService {
     @InjectRepository(GroupChatUser)
     private groupChatUserService: Repository<GroupChatUser>,
 
-    private readonly entityManager: EntityManager,
+    private friendShipService: FriendShipService,
   ) {}
 
   // 创建聊天列表
@@ -68,7 +69,7 @@ export class NotificationService {
           'notice.fromUserId IN ( SELECT userId FROM group_chat_user WHERE group_chat_user.groupChatId = notice.groupId ) ',
         )
         .getMany();
-      return res;
+      return this.friendShipService.selectUnreadNumber(res);
     } catch (error) {
       throw new ServiceUnavailableException(error);
     }
@@ -76,7 +77,7 @@ export class NotificationService {
 
   // 更新最新信息
   async update(id: number, createDto: CreateDto) {
-    this.notificationService
+    const res = await this.notificationService
       .createQueryBuilder('notice')
       .update()
       .set({
@@ -84,6 +85,9 @@ export class NotificationService {
       })
       .where('id = :id ', { id })
       .execute();
+    if (res.affected >= 1) {
+      return '更新成功';
+    }
   }
 
   // 更新状态

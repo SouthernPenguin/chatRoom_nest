@@ -18,11 +18,19 @@ export class Notice {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @Column({ comment: '未读消息条数' })
-  // toUserUnreadNumber: number;
+  @Column({
+    type: 'int',
+    nullable: true,
+    comment: '对方发给我，我这边未读信息数量',
+  })
+  friendMsgNumber: number;
 
-  // @Column({ comment: '未读消息条数' })
-  // fromUserUnreadNumber: number;
+  @Column({
+    type: 'int',
+    nullable: true,
+    comment: '自己发送给对方，对方未读信息数量',
+  })
+  userMsgNumber: number;
 
   @Column({
     comment: '私聊=ONE_FOR_ONE 群聊=MANY_TO_MANY',

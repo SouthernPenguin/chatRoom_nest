@@ -5,9 +5,14 @@ import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 import { WsModule } from 'src/ws/ws.module';
 import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { FriendShipModule } from 'src/friend-ship/friend-ship.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Notice, GroupChatUser]), WsModule],
+  imports: [
+    TypeOrmModule.forFeature([Notice, GroupChatUser]),
+    FriendShipModule,
+    WsModule,
+  ],
   controllers: [NotificationController],
   providers: [NotificationService],
   exports: [NotificationService],

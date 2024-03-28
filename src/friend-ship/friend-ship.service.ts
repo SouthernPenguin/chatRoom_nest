@@ -4,8 +4,12 @@ import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendShip } from './entities/friend-ship.entity';
 import { Repository } from 'typeorm';
-import { FriendShipEnum } from 'src/enum';
+import { ChatType, FriendShipEnum } from 'src/enum';
 import { UserService } from 'src/user/user.service';
+import { Notice } from 'src/notification/entities/notice.entity';
+import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
+import { Length } from 'class-validator';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
 
 @Injectable()
 export class FriendShipService {
@@ -14,6 +18,7 @@ export class FriendShipService {
     private userService: UserService,
     @InjectRepository(FriendShip)
     private friendShipRepository: Repository<FriendShip>,
+    private groupChatUserService: GroupChatUserService,
   ) {}
 
   async selectUser(id: number, name: string) {
@@ -63,6 +68,7 @@ export class FriendShipService {
     return this.friendShipRepository.save(res);
   }
 
+  // 更新状态;
   async upUserState(id: number, type: FriendShipEnum) {
     const res = await this.friendShipRepository.findOne({
       where: {
@@ -71,6 +77,68 @@ export class FriendShipService {
     });
     res.state = type;
     return this.friendShipRepository.save(res);
+  }
+
+  // 更新未读数量;
+  async upUserMsgNumber(msgNumber: { userId: number; msgNumber: string }[]) {
+    if (!msgNumber.length) {
+      throw new BadRequestException('');
+    }
+
+    const res = await this.friendShipRepository
+      .createQueryBuilder('friend-ship')
+      .where('friend-ship.sortedKey = :sortedKey', {
+        sortedKey: `${msgNumber[0].userId}-${msgNumber[1].userId}`,
+      })
+      .orWhere('friend-ship.sortedKey = :sortedKey', {
+        sortedKey: `${msgNumber[1].userId}-${msgNumber[0].userId}`,
+      })
+      .getOne();
+
+    if (res) {
+      const userRes = msgNumber.filter((i) => i.userId === res.userId);
+      if (userRes.length) {
+        res.userMsgNumber = Number(userRes[0].msgNumber);
+      }
+
+      const friendRes = msgNumber.filter((i) => i.userId === res.friendId);
+      if (friendRes.length) {
+        res.friendMsgNumber = Number(friendRes[0].msgNumber);
+      }
+
+      this.friendShipRepository.save(res);
+    }
+  }
+
+  async selectUnreadNumber(notices: Notice[]) {
+    if (notices.length) {
+      for await (const item of notices) {
+        if (item.msgType === ChatType.私聊) {
+          const msgNumber = await this.isFriend(
+            item.fromUser.id,
+            item.toUser.id,
+          );
+          if (msgNumber) {
+            item.friendMsgNumber = msgNumber.friendMsgNumber;
+            item.userMsgNumber = msgNumber.userMsgNumber;
+          }
+        }
+
+        if (item.msgType === ChatType.群聊) {
+          const res = await this.groupChatUserService.findOne(item.toUsers.id);
+          if (res.length) {
+            const msgNumber = res.filter(
+              (i) => i.msgNumber > 0,
+            ) as GroupChatUser[];
+
+            item.friendMsgNumber = msgNumber.length
+              ? msgNumber[0].msgNumber
+              : 0;
+          }
+        }
+      }
+    }
+    return notices;
   }
 
   async selectUserFriend(id: number) {

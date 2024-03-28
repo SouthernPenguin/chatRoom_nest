@@ -6,8 +6,10 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { GroupChatUser } from './group-chat-user';
 
 // 群聊
 @Entity()
@@ -22,7 +24,7 @@ export class GroupChat {
   notice: string;
 
   // 创建人
-  @ManyToOne(() => User, (user) => user.groupChatUsers)
+  @ManyToOne(() => User, (user) => user.groupChats)
   @JoinColumn({ name: 'createdUserId' })
   createdUserId: User;
 
@@ -32,7 +34,9 @@ export class GroupChat {
   })
   users: User[];
 
-  // @ManyToOne(() => GroupMessage, (groupMessage) => groupMessage.id)
-  // @JoinColumn({ name: 'messageId' })
-  // groupMessageId: GroupMessage;
+  // @OneToMany(
+  //   () => GroupChatUser,
+  //   (userBusinessLine) => userBusinessLine.groupChat,
+  // )
+  // groupChatUser: GroupChatUser[];
 }

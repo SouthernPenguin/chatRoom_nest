@@ -27,8 +27,25 @@ export class MessageService {
     }
 
     const resCreate = await this.messageRepository.create(createMessageDto);
-
     const res = await this.messageRepository.save(resCreate);
+
+    // 统计未读信息
+    const countUnReadNumber = await this.messageRepository
+      .createQueryBuilder('message')
+      .select('message.fromUserId as userId, COUNT(*) AS msgNumber')
+      .where(
+        '(message.fromUserId = :fromUserId and message.toUserId = :toUserId ) or (message.fromUserId = :toUserId and message.toUserId = :fromUserId )',
+        {
+          fromUserId: createMessageDto.fromUserId,
+          toUserId: createMessageDto.toUserId,
+        },
+      )
+      .andWhere('message.state = :state', { state: MessageEnum.未读 })
+      .groupBy('fromUserId')
+      .getRawMany();
+    await this.friendShipService.upUserMsgNumber(countUnReadNumber);
+
+    // 发送通知
     if (res?.id) {
       await this.notificationService.create({
         newMessage: res.fileSize
@@ -71,7 +88,7 @@ export class MessageService {
           toUserId: listMessageDto.toUserId,
         },
       )
-      .orderBy('message.createdTime', 'ASC')
+      .addOrderBy('message.createdTime', 'DESC')
       .leftJoinAndSelect('message.toUser', 'toUser') // 关联的实体属性，别名
       .leftJoinAndSelect('message.fromUser', 'fromUser');
 

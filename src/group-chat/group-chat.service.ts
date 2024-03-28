@@ -18,9 +18,10 @@ export class GroupChatService {
   ) {}
 
   async create(userId: number, createGroupChatDto: CreateGroupChatDto) {
-    const userList = await this.userAuthService.selectAllUser(
-      createGroupChatDto.userIds,
-    );
+    const userList = await this.userAuthService.selectAllUser([
+      ...createGroupChatDto.userIds,
+      userId,
+    ]);
     const userList1 = await this.userAuthService.selectAllUser([userId]);
     createGroupChatDto.users = userList;
     createGroupChatDto.createdUserId = userList1[0];

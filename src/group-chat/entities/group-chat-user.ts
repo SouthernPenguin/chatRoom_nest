@@ -1,7 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { GroupChat } from './group-chat.entity';
 
-@Entity('group_chat_user')
+@Entity()
 export class GroupChatUser {
   @Column()
   @IsNotEmpty()
@@ -14,5 +16,16 @@ export class GroupChatUser {
   userId: number;
 
   @Column({ type: 'boolean', nullable: true, comment: '是否禁言', default: 0 })
+  @PrimaryColumn()
   isSpeak: boolean;
+
+  @Column({ type: 'int', nullable: true, comment: '消息数量' })
+  @PrimaryColumn()
+  msgNumber: number;
+
+  // @ManyToOne(() => User, (user) => user.groupChatUser)
+  // userId: User;
+
+  // @ManyToOne(() => GroupChat, (user) => user.groupChatUser)
+  // groupChatId: GroupChat;
 }
