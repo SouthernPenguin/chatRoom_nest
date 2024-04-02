@@ -39,6 +39,6 @@ export class User {
   @ManyToMany(() => GroupChat, (groupChat) => groupChat.users)
   groupChats: GroupChat[];
 
-  // @OneToMany(() => GroupChatUser, (userBusinessLine) => userBusinessLine.user)
-  // groupChatUser: GroupChatUser[];
+  @OneToMany(() => GroupChatUser, (userBusinessLine) => userBusinessLine.user)
+  groupChatUser: GroupChatUser[];
 }

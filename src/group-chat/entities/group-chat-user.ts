@@ -16,16 +16,18 @@ export class GroupChatUser {
   userId: number;
 
   @Column({ type: 'boolean', nullable: true, comment: '是否禁言', default: 0 })
-  @PrimaryColumn()
   isSpeak: boolean;
 
   @Column({ type: 'int', nullable: true, comment: '消息数量' })
-  @PrimaryColumn()
   msgNumber: number;
 
-  // @ManyToOne(() => User, (user) => user.groupChatUser)
-  // userId: User;
+  @ManyToOne(() => User, (user) => user.groupChatUser, {
+    createForeignKeyConstraints: false,
+  })
+  user: User;
 
-  // @ManyToOne(() => GroupChat, (user) => user.groupChatUser)
-  // groupChatId: GroupChat;
+  @ManyToOne(() => GroupChat, (user) => user.groupChatUser, {
+    createForeignKeyConstraints: false,
+  })
+  groupChat: GroupChat;
 }
