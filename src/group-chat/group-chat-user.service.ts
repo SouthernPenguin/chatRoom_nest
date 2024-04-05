@@ -38,7 +38,7 @@ export class GroupChatUserService {
   // 查询用户是否在群里
   selectUser(userId: number) {
     return this.groupChatUserRepository.findOne({
-      // where: { userId },
+      where: { userId },
     });
   }
 }
