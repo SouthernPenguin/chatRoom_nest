@@ -80,19 +80,21 @@ export class FriendShipService {
   }
 
   // 更新未读数量;
-  async upUserMsgNumber(msgNumber: { userId: number; msgNumber: string }[]) {
+  async upUserMsgNumber(
+    msgNumber: { userId: number; msgNumber: number | string }[],
+  ) {
     if (!msgNumber.length) {
       throw new BadRequestException('');
     }
-
     const res = await this.friendShipRepository
       .createQueryBuilder('friend-ship')
-      .where('friend-ship.sortedKey = :sortedKey', {
-        sortedKey: `${msgNumber[0].userId}-${msgNumber[1].userId}`,
-      })
-      .orWhere('friend-ship.sortedKey = :sortedKey', {
-        sortedKey: `${msgNumber[1].userId}-${msgNumber[0].userId}`,
-      })
+      .where(
+        'friend-ship.sortedKey = :sortedKey1 or friend-ship.sortedKey = :sortedKey2',
+        {
+          sortedKey1: `${msgNumber[0].userId}-${msgNumber[1].userId}`,
+          sortedKey2: `${msgNumber[1].userId}-${msgNumber[0].userId}`,
+        },
+      )
       .getOne();
 
     if (res) {
@@ -105,8 +107,9 @@ export class FriendShipService {
       if (friendRes.length) {
         res.friendMsgNumber = Number(friendRes[0].msgNumber);
       }
-
       this.friendShipRepository.save(res);
+    } else {
+      throw new BadRequestException('');
     }
   }
 

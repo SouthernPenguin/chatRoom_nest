@@ -21,13 +21,13 @@ export class GroupChatUser {
   @Column({ type: 'int', nullable: true, comment: '消息数量' })
   msgNumber: number;
 
-  @ManyToOne(() => User, (user) => user.groupChatUser, {
-    createForeignKeyConstraints: false,
-  })
-  user: User;
+  // @ManyToOne(() => User, (user) => user.groupChatUser, {
+  //   createForeignKeyConstraints: false,
+  // })
+  // user: User;
 
-  @ManyToOne(() => GroupChat, (user) => user.groupChatUser, {
-    createForeignKeyConstraints: false,
-  })
-  groupChat: GroupChat;
+  // @ManyToOne(() => GroupChat, (user) => user.groupChatUser, {
+  //   createForeignKeyConstraints: false,
+  // })
+  // groupChat: GroupChat;
 }

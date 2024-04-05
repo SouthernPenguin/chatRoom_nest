@@ -43,6 +43,17 @@ export class MessageService {
       .andWhere('message.state = :state', { state: MessageEnum.未读 })
       .groupBy('fromUserId')
       .getRawMany();
+
+    if (countUnReadNumber.length < 2) {
+      countUnReadNumber.push({
+        userId:
+          countUnReadNumber[0].userId === createMessageDto.toUserId
+            ? createMessageDto.fromUserId
+            : createMessageDto.toUserId,
+        msgNumber: 0,
+      });
+    }
+
     await this.friendShipService.upUserMsgNumber(countUnReadNumber);
 
     // 发送通知
