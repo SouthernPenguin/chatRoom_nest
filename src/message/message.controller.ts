@@ -9,6 +9,7 @@ import {
   Param,
   Req,
   Delete,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -47,21 +48,40 @@ export class MessageController {
     @Req() req: Request,
     @Body() createMessageDto: CreateMessageDto,
   ) {
-    const res = await this.messageService.create(createMessageDto);
+    try {
+      const res = await this.messageService.create(createMessageDto);
+      const currentUser = await getTokenUser(req); // 当前用户
+      // 通知
+      const r = await this.messageService.getNewNotice(currentUser?.id);
+      this.ws.server.emit('activeUserNoticeList', r);
+
+      // 聊天记录
+      this.ws.server.emit(
+        'activeTowUsers',
+        await this.findAll({
+          fromUserId: createMessageDto.fromUserId,
+          toUserId: createMessageDto.toUserId,
+        } as ListMessageDto),
+      );
+      return res;
+    } catch (error) {
+      console.log(error, 'errorerror');
+    }
+  }
+
+  @Put()
+  @ApiOperation({ summary: '批量更新信息状态' })
+  @ApiQuery({ type: ListMessageDto, description: '' })
+  @UseInterceptors(ListInterceptorsInterceptor)
+  async messageState(
+    @Req() req: Request,
+    @Query() listMessageDto: ListMessageDto,
+  ) {
     const currentUser = await getTokenUser(req); // 当前用户
-    // 通知
+    await this.messageService.upAllState(listMessageDto, currentUser?.id);
+
     const r = await this.messageService.getNewNotice(currentUser?.id);
     this.ws.server.emit('activeUserNoticeList', r);
-
-    // 聊天记录
-    this.ws.server.emit(
-      'activeTowUsers',
-      await this.findAll({
-        fromUserId: createMessageDto.fromUserId,
-        toUserId: createMessageDto.toUserId,
-      } as ListMessageDto),
-    );
-    return res;
   }
 
   @Get()

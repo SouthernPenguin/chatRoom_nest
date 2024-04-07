@@ -69,7 +69,7 @@ export class NotificationService {
           'notice.fromUserId IN ( SELECT userId FROM group_chat_user WHERE group_chat_user.groupChatId = notice.groupId ) ',
         )
         .getMany();
-      return this.friendShipService.selectUnreadNumber(res);
+      return await this.friendShipService.selectUnreadNumber(res);
     } catch (error) {
       throw new ServiceUnavailableException(error);
     }
