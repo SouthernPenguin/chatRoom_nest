@@ -28,7 +28,7 @@ export const connectionParams = {
     GroupMessage,
     GroupChatUser,
   ], // 导入的实体(数据库模型)
-  synchronize: true,
+  synchronize: false,
   // 日志等级
   logging: true, //['query', 'error'],
 } as TypeOrmModuleOptions;

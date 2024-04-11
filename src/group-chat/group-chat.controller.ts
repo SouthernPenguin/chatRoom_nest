@@ -15,6 +15,7 @@ import { getTokenUser } from 'src/utils';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
+import { CreatedGroupChatPipe } from './pipe/created-group-chat/created-group-chat.pipe';
 
 @Controller('group-chat')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
@@ -27,7 +28,7 @@ export class GroupChatController {
   @ApiBody({ type: CreateGroupChatDto, description: '' })
   async create(
     @Req() req: Request,
-    @Body() createGroupChatDto: CreateGroupChatDto,
+    @Body(new CreatedGroupChatPipe()) createGroupChatDto: CreateGroupChatDto,
   ) {
     const currentUser = await getTokenUser(req);
     return await this.groupChatService.create(
