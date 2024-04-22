@@ -4,5 +4,10 @@ db:
     database: 'chat_room'
     password: '123456'
     flag: 'dev'
+
 JWT:
   secret: 'fsdFSD@#$24+9*-'
+
+REDIS:
+  password: '123456'
+  prot: 6379

@@ -25,6 +25,7 @@ import { WsModule } from './ws/ws.module';
 import { FilesModule } from './files/files.module';
 import { GroupChatModule } from './group-chat/group-chat.module';
 import { GroupMessageModule } from './group-message/group-message.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { GroupMessageModule } from './group-message/group-message.module';
     FilesModule,
     GroupChatModule,
     GroupMessageModule,
+    RedisModule,
   ],
   controllers: [],
   providers: [

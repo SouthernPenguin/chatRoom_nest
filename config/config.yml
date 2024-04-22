@@ -8,7 +8,12 @@ JWT:
   secret: 'fsdFSD@#$24+9*-'
   expiresIn: '4h'
 
-# 端口
+# redis
+REDIS:
+  password: '123456'
+  prot: 6379
+
+# 启动端口
 PORT: 8468
 
 # 静态文件目录
