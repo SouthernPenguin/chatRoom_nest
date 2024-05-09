@@ -1,17 +1,14 @@
-import {
-  BadRequestException,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from './entities/message.entity';
 import { ListMessageDto } from './dto/list-message.dto';
-import { MessageEnum } from 'src/enum';
+import { ChatType, MessageEnum } from 'src/enum';
 import { NotificationService } from 'src/notification/notification.service';
 import { FriendShipService } from 'src/friend-ship/friend-ship.service';
 import { ChangeMessageState } from './dto/change-message-state';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class MessageService {
@@ -20,9 +17,10 @@ export class MessageService {
     private messageRepository: Repository<Message>,
     private notificationService: NotificationService,
     private friendShipService: FriendShipService,
+    private redisService: RedisService,
   ) {}
 
-  async create(createMessageDto: CreateMessageDto) {
+  async create(createMessageDto: CreateMessageDto, currentUser?: number) {
     const isFriend = await this.friendShipService.isFriend(
       createMessageDto.toUserId,
       createMessageDto.fromUserId,
@@ -35,7 +33,7 @@ export class MessageService {
     const res = await this.messageRepository.save(resCreate);
 
     // 统计未读信息
-    await this.countUnReadNumber(createMessageDto);
+    await this.countUnReadNumber(createMessageDto, currentUser);
 
     // 发送通知
     if (res?.id) {
@@ -56,7 +54,8 @@ export class MessageService {
     return await this.notificationService.findOne(id);
   }
 
-  async findAll(listMessageDto: ListMessageDto) {
+  // 聊天记录列表;
+  async findAll(listMessageDto: ListMessageDto, currentUser?: number) {
     const { page, limit } = listMessageDto;
     const queryBuilder = this.messageRepository
       .createQueryBuilder('message')
@@ -83,6 +82,41 @@ export class MessageService {
       .addOrderBy('message.createdTime', 'DESC')
       .leftJoinAndSelect('message.toUser', 'toUser') // 关联的实体属性，别名
       .leftJoinAndSelect('message.fromUser', 'fromUser');
+
+    const allRedisList = await this.redisService.getAllActiveUser();
+    const allRedisListParse = allRedisList.map((item: string) =>
+      JSON.parse(item),
+    );
+    if (currentUser) {
+      if (
+        allRedisListParse.filter((item) => item.userId === currentUser).length <
+        1
+      ) {
+        // 双方用户正在聊天 设置缓存
+        this.redisService.setList({
+          msgType: ChatType.私聊,
+          userId: currentUser,
+          toUserId:
+            listMessageDto.fromUserId === currentUser
+              ? listMessageDto.toUserId
+              : listMessageDto.fromUserId,
+        });
+      } else {
+        this.redisService.deleteActiveUserItem(
+          JSON.stringify(
+            allRedisListParse.filter((item) => item.userId === currentUser)[0],
+          ),
+        );
+        this.redisService.setList({
+          msgType: ChatType.私聊,
+          userId: currentUser,
+          toUserId:
+            listMessageDto.fromUserId === currentUser
+              ? listMessageDto.toUserId
+              : listMessageDto.fromUserId,
+        });
+      }
+    }
 
     const count = await queryBuilder.getCount();
     const content = await queryBuilder
@@ -124,7 +158,7 @@ export class MessageService {
         .execute();
 
       if (withdraw.affected > 0) {
-        await this.countUnReadNumber(changeMessageState);
+        await this.countUnReadNumber(changeMessageState, currentUser);
       }
     } catch (error) {
       console.log(error, 'sssssss');
@@ -173,66 +207,79 @@ export class MessageService {
   }
 
   // 统计双方未读次数
-  async countUnReadNumber(createMessageDto: ChangeMessageState) {
-    let countUnReadNumber = await this.messageRepository
-      .createQueryBuilder('message')
-      .select('message.fromUserId as userId, COUNT(*) AS msgNumber')
-      .where(
-        `((message.fromUserId = :fromUserId and message.toUserId = :toUserId ) or (message.fromUserId = :toUserId and message.toUserId = :fromUserId )) and 
-        message.state = :state
+  async countUnReadNumber(
+    createMessageDto: ChangeMessageState,
+    currentUser: number,
+  ) {
+    try {
+      let countUnReadNumberQuery = await this.messageRepository
+        .createQueryBuilder('message')
+        .select('message.fromUserId as userId, COUNT(*) AS msgNumber')
+        .where(
+          `
+          ((message.fromUserId = :fromUserId and message.toUserId = :toUserId ) or (message.fromUserId = :toUserId and message.toUserId = :fromUserId )) 
+          and 
+          message.state = :state
         `,
-        {
-          fromUserId: createMessageDto.fromUserId,
-          toUserId: createMessageDto.toUserId,
-          state: MessageEnum.未读,
-        },
-      )
-      .groupBy('userId')
-      .getRawMany();
+          {
+            fromUserId: createMessageDto.fromUserId,
+            toUserId: createMessageDto.toUserId,
+            state: MessageEnum.未读,
+          },
+        )
+        .groupBy('userId')
+        .getRawMany();
 
-    if (countUnReadNumber.length && countUnReadNumber.length < 2) {
-      countUnReadNumber.push({
-        userId:
-          countUnReadNumber[0].userId === createMessageDto.toUserId
-            ? createMessageDto.fromUserId
-            : createMessageDto.toUserId,
-        msgNumber: 0,
-      });
-    } else {
-      countUnReadNumber = [
-        {
-          userId: createMessageDto.toUserId,
+      // 赋值未读信息
+      if (countUnReadNumberQuery.length && countUnReadNumberQuery.length < 2) {
+        countUnReadNumberQuery.push({
+          userId:
+            countUnReadNumberQuery[0].userId === createMessageDto.toUserId
+              ? createMessageDto.fromUserId
+              : createMessageDto.toUserId,
           msgNumber: 0,
-        },
-        {
-          userId: createMessageDto.fromUserId,
-          msgNumber: 0,
-        },
-      ];
+        });
+      } else {
+        countUnReadNumberQuery = [
+          {
+            userId: createMessageDto.toUserId,
+            msgNumber: 0,
+          },
+          {
+            userId: createMessageDto.fromUserId,
+            msgNumber: 0,
+          },
+        ];
+      }
+
+      // 获取所有缓存
+      const redisList = (await this.redisService.getAllActiveUser()).map(
+        (item) => JSON.parse(item),
+      ) as {
+        msgType: ChatType;
+        userId: number;
+        toUserId: number;
+      }[];
+
+      // 过滤出当前发送用户的缓存
+      const filterList = redisList.filter(
+        (item) => item.userId === currentUser,
+      );
+
+      // 通过当前用户缓存，再去找对方是否和自己正在聊天
+      const areBothPartiesChatting = redisList.filter(
+        (item) => item.toUserId === filterList[0].userId,
+      );
+
+      if (areBothPartiesChatting.length) {
+        countUnReadNumberQuery.forEach((item) => {
+          item.msgNumber = 0;
+        });
+      }
+
+      await this.friendShipService.upUserMsgNumber(countUnReadNumberQuery);
+    } catch (error) {
+      console.log(error);
     }
-
-    // 双方正在聊天更新条数：
-    /**
-       A用户  vs B用户
-      redis
-      [
-        {
-            1.A点击B用户
-
-          // A用户
-          userId:当前用户A,
-          toUserId:当前聊天用户B
-        },
-        {
-          1.B点击A用户
-          // B用户
-          userId:当前用户B,
-          toUserId:当前聊天用户A
-        }
-      ]
-      A用户发送给B，缓存里取A，通过toUserId去获取B用户，在通过B户用的toUserId是否是我，判断是否更新未读信息
-    */
-
-    await this.friendShipService.upUserMsgNumber(countUnReadNumber);
   }
 }

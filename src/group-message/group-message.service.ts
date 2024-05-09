@@ -3,10 +3,11 @@ import { CreateGroupMessageDto } from './dto/create-group-message.dto';
 import { GroupMessage } from './entities/group-message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MessageEnum } from 'src/enum';
+import { ChatType, MessageEnum } from 'src/enum';
 import { ListGroupMessageDto } from './dto/list-group-message.dto';
 import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
 import { NotificationService } from 'src/notification/notification.service';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class GroupMessageService {
@@ -16,6 +17,7 @@ export class GroupMessageService {
     private groupChatService: GroupChatUserService,
     private notificationService: NotificationService,
     private groupChatUserService: GroupChatUserService,
+    private redisService: RedisService,
   ) {}
 
   async create(createGroupMessageDto: CreateGroupMessageDto) {
@@ -32,12 +34,16 @@ export class GroupMessageService {
       .createQueryBuilder('group-message')
       .select('count(*) as msgNumber')
       .where('groupId = :groupId', { groupId: createGroupMessageDto.groupId })
-      .andWhere('group-message.state = :state', { state: MessageEnum.未读 })
+      // .andWhere('group-message.state = :state', { state: MessageEnum.未读 })
+      // .andWhere('fromUserId <> :fromUserId', {
+      //   fromUserId: createGroupMessageDto.fromUserId,
+      // })
       .getRawOne();
 
     await this.groupChatUserService.updateMsgNumber(
       createGroupMessageDto.groupId,
       r.msgNumber,
+      createGroupMessageDto.fromUserId,
     );
 
     if (returnRes?.id) {
@@ -54,7 +60,11 @@ export class GroupMessageService {
     return returnRes;
   }
 
-  async findAll(id: number | string, listGroupMessage: ListGroupMessageDto) {
+  async findAll(
+    id: number | string,
+    listGroupMessage: ListGroupMessageDto,
+    currentUser?: number,
+  ) {
     const { page, limit } = listGroupMessage;
     const queryBuilder = this.groupMessageRepository
       .createQueryBuilder('group-message')
@@ -73,6 +83,35 @@ export class GroupMessageService {
     queryBuilder
       .andWhere('group-message.groupId = :id', { id })
       .leftJoinAndSelect('group-message.fromUser', 'fromUserId');
+
+    const allRedisList = await this.redisService.getAllActiveUser();
+    const allRedisListParse = allRedisList.map((item: string) =>
+      JSON.parse(item),
+    );
+    if (currentUser) {
+      if (
+        allRedisListParse.filter((item) => item.userId === currentUser).length <
+        1
+      ) {
+        // 双方用户正在聊天 设置缓存
+        this.redisService.setList({
+          msgType: ChatType.群聊,
+          userId: currentUser,
+          toUserId: Number(id),
+        });
+      } else {
+        this.redisService.deleteActiveUserItem(
+          JSON.stringify(
+            allRedisListParse.filter((item) => item.userId === currentUser)[0],
+          ),
+        );
+        this.redisService.setList({
+          msgType: ChatType.群聊,
+          userId: currentUser,
+          toUserId: Number(id),
+        });
+      }
+    }
 
     const count = await queryBuilder.getCount();
     const content = await queryBuilder

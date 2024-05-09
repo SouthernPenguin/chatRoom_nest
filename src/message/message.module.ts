@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationModule } from 'src/notification/notification.module';
 import { WsModule } from 'src/ws/ws.module';
 import { FriendShipModule } from 'src/friend-ship/friend-ship.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
     FriendShipModule,
     WsModule,
     NotificationModule,
+    RedisModule,
     TypeOrmModule.forFeature([Message]),
   ],
   controllers: [MessageController],

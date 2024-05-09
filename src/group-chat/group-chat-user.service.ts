@@ -31,7 +31,9 @@ export class GroupChatUserService {
         msgNumber,
       })
       .where('groupChatId = :id', { id: groupChatId })
-      // .andWhere
+      .andWhere('userId <> :userId', {
+        userId: userId,
+      })
       .execute();
   }
 

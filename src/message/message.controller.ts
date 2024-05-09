@@ -49,8 +49,11 @@ export class MessageController {
     @Body() createMessageDto: CreateMessageDto,
   ) {
     try {
-      const res = await this.messageService.create(createMessageDto);
       const currentUser = await getTokenUser(req); // 当前用户
+      const res = await this.messageService.create(
+        createMessageDto,
+        currentUser?.id,
+      );
       // 通知
       const r = await this.messageService.getNewNotice(currentUser?.id);
       this.ws.server.emit('activeUserNoticeList', r);
@@ -63,9 +66,10 @@ export class MessageController {
           toUserId: createMessageDto.toUserId,
         } as ListMessageDto),
       );
+
       return res;
     } catch (error) {
-      console.log(error, 'errorerror');
+      console.log(error, 'error');
     }
   }
 
@@ -88,8 +92,9 @@ export class MessageController {
   @ApiOperation({ summary: '聊天记录列表' })
   @ApiQuery({ type: ListMessageDto, description: '' })
   @UseInterceptors(ListInterceptorsInterceptor)
-  async findAll(@Query() listMessageDto: ListMessageDto) {
-    return await this.messageService.findAll(listMessageDto);
+  async findAll(@Query() listMessageDto: ListMessageDto, @Req() req?: Request) {
+    const currentUser = await getTokenUser(req); // 当前用户
+    return await this.messageService.findAll(listMessageDto, currentUser?.id);
   }
 
   @Post(':id')

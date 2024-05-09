@@ -6,12 +6,14 @@ import { GroupMessage } from './entities/group-message.entity';
 import { GroupChatModule } from 'src/group-chat/group-chat.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { WsModule } from 'src/ws/ws.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
     WsModule,
     NotificationModule,
     GroupChatModule,
+    RedisModule,
     TypeOrmModule.forFeature([GroupMessage]),
   ],
   controllers: [GroupMessageController],

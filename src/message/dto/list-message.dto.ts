@@ -23,4 +23,12 @@ export class ListMessageDto extends OmitType(CreateMessageDto, [
   @IsArray()
   @IsOptional()
   createdTime: any;
+
+  // @ApiProperty({
+  //   example: '[1,2]',
+  //   description: '[上个聊天用户,当前用户]',
+  // })
+  // @IsOptional()
+  // @IsArray()
+  // selectUsersIds: number[];
 }

@@ -60,11 +60,17 @@ export class GroupMessageController {
   @Get(':id')
   @ApiOperation({ summary: '群聊详情信息' })
   @ApiParam({ name: 'id' })
-  findOne(
+  async findOne(
     @Param('id') id: number | string,
     @Query() listGroupMessage: ListGroupMessageDto,
+    @Req() req?: Request,
   ) {
-    return this.groupMessageService.findAll(id, listGroupMessage);
+    const currentUser = await getTokenUser(req); // 当前用户
+    return this.groupMessageService.findAll(
+      id,
+      listGroupMessage,
+      currentUser?.id,
+    );
   }
 
   @Post('/backMsg')

@@ -29,12 +29,14 @@ export class RedisService {
     return this.redisClient.sadd('activeUser', [JSON.stringify(hashSet)]);
   }
 
+  // 获取缓存
   async getAllActiveUser() {
     return await this.redisClient.smembers('activeUser');
   }
 
+  // 删除某个缓存
   async deleteActiveUserItem(value: string) {
-    const rse = await this.redisClient.srem('sdsdf', value);
+    const rse = await this.redisClient.srem('activeUser', value);
     return rse;
   }
 }

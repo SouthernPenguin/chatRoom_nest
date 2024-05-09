@@ -79,13 +79,20 @@ export class FriendShipService {
     return this.friendShipRepository.save(res);
   }
 
-  // 更新未读数量;
+  /**
+   * 更新未读数量;
+   * @param msgNumber 双方未读信息数量
+   * @param activeChatUser 当前正在聊天用户
+   */
+
   async upUserMsgNumber(
     msgNumber: { userId: number; msgNumber: number | string }[],
   ) {
     if (!msgNumber.length) {
       throw new BadRequestException('');
     }
+
+    //查询好友关系
     const res = await this.friendShipRepository
       .createQueryBuilder('friend-ship')
       .where(
