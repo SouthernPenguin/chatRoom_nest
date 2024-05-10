@@ -1,7 +1,7 @@
 db:
   mysql:
-    username: 'root_pro'
-    database: 'school'
+    username: 'root'
+    database: 'chat_room'
     password: '123456'
     flag: 'pro'
 JWT:
