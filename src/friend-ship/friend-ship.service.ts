@@ -9,7 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { Notice } from 'src/notification/entities/notice.entity';
 import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
 import { Length } from 'class-validator';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 
 @Injectable()
 export class FriendShipService {

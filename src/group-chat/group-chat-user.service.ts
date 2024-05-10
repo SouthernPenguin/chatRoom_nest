@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GroupChatUser } from './entities/group-chat-user';
+import { GroupChatUser } from './entities/group-chat-user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 

@@ -4,7 +4,7 @@ import { Notice } from './entities/notice.entity';
 import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 import { WsModule } from 'src/ws/ws.module';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 import { FriendShipModule } from 'src/friend-ship/friend-ship.module';
 
 @Module({

@@ -4,7 +4,7 @@ import { GroupChatController } from './group-chat.controller';
 import { GroupChat } from './entities/group-chat.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/user/user.module';
-import { GroupChatUser } from './entities/group-chat-user';
+import { GroupChatUser } from './entities/group-chat-user.entity';
 import { GroupChatUserService } from './group-chat-user.service';
 
 @Module({

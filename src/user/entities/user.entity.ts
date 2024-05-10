@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import {
   Column,

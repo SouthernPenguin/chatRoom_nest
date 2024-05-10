@@ -7,7 +7,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Notice } from 'src/notification/entities/notice.entity';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import { GroupMessage } from 'src/group-message/entities/group-message.entity';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 
 const mySqlConfig: any = redConfigFile();
 

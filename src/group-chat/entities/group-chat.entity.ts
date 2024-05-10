@@ -9,7 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { GroupChatUser } from './group-chat-user';
+import { GroupChatUser } from './group-chat-user.entity';
 
 // 群聊
 @Entity()

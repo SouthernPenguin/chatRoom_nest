@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateDto } from './dto/create-notification.dto';
 import { ChatType, MessageEnum } from 'src/enum';
 import { Notice } from './entities/notice.entity';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 import { FriendShipService } from 'src/friend-ship/friend-ship.service';
 
 @Injectable()
