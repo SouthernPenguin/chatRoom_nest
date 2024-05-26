@@ -11,30 +11,11 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 26/03/2024 08:12:52
+ Date: 26/05/2024 22:00:39
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for file
--- ----------------------------
-DROP TABLE IF EXISTS `file`;
-CREATE TABLE `file`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '文件名',
-  `size` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '文件大小',
-  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '文件类型',
-  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '文件路径',
-  `upLoadUserId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '上传者id',
-  `createdTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of file
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for friend_ship
@@ -44,29 +25,27 @@ CREATE TABLE `friend_ship`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NULL DEFAULT NULL COMMENT '自己id',
   `friendId` int(11) NULL DEFAULT NULL COMMENT '对方id',
-  `sortedKey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '自己id + 对方id',
-  `state` enum('INITIATE','PASS','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL DEFAULT 'INITIATE' COMMENT '好友状态',
-  `createdTime` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `sortedKey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '自己id + 对方id',
+  `state` enum('INITIATE','PASS','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'INITIATE' COMMENT '好友状态',
   `fromUserId` int(11) NULL DEFAULT NULL COMMENT '发送者(ID)',
   `toUserId` int(11) NULL DEFAULT NULL COMMENT '接收者(ID)',
-  `notes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '备注',
+  `notes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   `userMsgNumber` int(11) NULL DEFAULT NULL COMMENT '自己发送给对方，对方未读信息数量',
   `friendMsgNumber` int(11) NULL DEFAULT NULL COMMENT '对方发给我，我这边未读信息数量',
+  `createdTime` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `IDX_26df3e1d8b7428b9d601194839`(`userId` ASC, `friendId` ASC, `sortedKey` ASC) USING BTREE,
   INDEX `FK_7dfc010217195c6bc513a387b5d`(`fromUserId` ASC) USING BTREE,
   INDEX `FK_23074ba2f6791bef3f5e9ee6c8e`(`toUserId` ASC) USING BTREE,
   CONSTRAINT `FK_23074ba2f6791bef3f5e9ee6c8e` FOREIGN KEY (`toUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_7dfc010217195c6bc513a387b5d` FOREIGN KEY (`fromUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 50 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of friend_ship
 -- ----------------------------
-INSERT INTO `friend_ship` VALUES (35, 6, 1, '6-1', 'PASS', '2023-12-17 07:37:39.992965', 6, 1, 'minim culpa', 10, 34);
-INSERT INTO `friend_ship` VALUES (47, 1, 8, '1-8', 'PASS', '2023-12-23 08:08:40.628162', 1, 8, 'sdsad', NULL, NULL);
-INSERT INTO `friend_ship` VALUES (48, 1, 7, '1-7', 'PASS', '2023-12-24 13:17:53.655104', 1, 7, '333', NULL, NULL);
-INSERT INTO `friend_ship` VALUES (49, 8, 7, '8-7', 'PASS', '2024-02-27 12:51:42.990254', 8, 7, 'ts', NULL, NULL);
+INSERT INTO `friend_ship` VALUES (3, 1, 2, '1-2', 'PASS', 1, 2, '阿斯顿', 0, 0, '2024-04-05 06:36:36.099917');
+INSERT INTO `friend_ship` VALUES (4, 1, 3, '1-3', 'PASS', 1, 3, NULL, 2, 0, '2024-04-10 13:12:10.931333');
 
 -- ----------------------------
 -- Table structure for group_chat
@@ -74,20 +53,19 @@ INSERT INTO `friend_ship` VALUES (49, 8, 7, '8-7', 'PASS', '2024-02-27 12:51:42.
 DROP TABLE IF EXISTS `group_chat`;
 CREATE TABLE `group_chat`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '群名',
-  `notice` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '公告',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '群名',
+  `notice` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '公告',
   `createdUserId` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_682430251530a14d93154def648`(`createdUserId` ASC) USING BTREE,
   CONSTRAINT `FK_682430251530a14d93154def648` FOREIGN KEY (`createdUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of group_chat
 -- ----------------------------
-INSERT INTO `group_chat` VALUES (13, '连连她技', NULL, 1);
-INSERT INTO `group_chat` VALUES (14, '管风志处技层', NULL, 6);
-INSERT INTO `group_chat` VALUES (15, '关节象步产已', NULL, 6);
+INSERT INTO `group_chat` VALUES (6, '数斯常老力条,子需统论其族切', NULL, 1);
+INSERT INTO `group_chat` VALUES (7, '数斯常老力条,子需统论其族切', NULL, 1);
 
 -- ----------------------------
 -- Table structure for group_chat_user
@@ -98,27 +76,24 @@ CREATE TABLE `group_chat_user`  (
   `userId` int(11) NOT NULL,
   `isSpeak` tinyint(4) NULL DEFAULT 0 COMMENT '是否禁言',
   `msgNumber` int(11) NULL DEFAULT NULL COMMENT '消息数量',
+  `enterTime` timestamp NULL DEFAULT NULL COMMENT '进入聊天室时间',
+  `exitTime` timestamp NULL DEFAULT NULL COMMENT '离开聊天室时间',
   PRIMARY KEY (`groupChatId`, `userId`) USING BTREE,
   INDEX `IDX_6821d5492eb83f7e48d0fe124e`(`groupChatId` ASC) USING BTREE,
   INDEX `IDX_cd628a8651b7ff01b752a3638b`(`userId` ASC) USING BTREE,
   CONSTRAINT `FK_6821d5492eb83f7e48d0fe124e0` FOREIGN KEY (`groupChatId`) REFERENCES `group_chat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_cd628a8651b7ff01b752a3638b3` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of group_chat_user
 -- ----------------------------
-INSERT INTO `group_chat_user` VALUES (13, 1, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (13, 20, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (13, 21, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (13, 22, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (13, 23, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (14, 1, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (14, 6, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (14, 12, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (15, 6, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (15, 15, 0, NULL);
-INSERT INTO `group_chat_user` VALUES (15, 16, 0, NULL);
+INSERT INTO `group_chat_user` VALUES (6, 1, 0, NULL, '2024-05-26 21:45:34', '2024-05-26 21:45:47');
+INSERT INTO `group_chat_user` VALUES (6, 2, 0, 1, NULL, NULL);
+INSERT INTO `group_chat_user` VALUES (6, 3, 0, 1, NULL, NULL);
+INSERT INTO `group_chat_user` VALUES (7, 1, 0, NULL, '2024-05-26 21:45:27', '2024-05-26 21:45:34');
+INSERT INTO `group_chat_user` VALUES (7, 2, 0, 1, NULL, NULL);
+INSERT INTO `group_chat_user` VALUES (7, 3, 0, 1, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for group_message
@@ -126,106 +101,58 @@ INSERT INTO `group_chat_user` VALUES (15, 16, 0, NULL);
 DROP TABLE IF EXISTS `group_message`;
 CREATE TABLE `group_message`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fileType` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '文件类型',
-  `fileSize` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '文件大小',
-  `postMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '聊天内容',
+  `state` enum('UNREAD','READ','WITHDRAW','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'UNREAD' COMMENT '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
+  `fileType` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '文件类型',
+  `fileSize` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '文件大小',
+  `postMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '聊天内容',
   `groupId` int(11) NULL DEFAULT NULL COMMENT '群id/同时是接收者id',
   `fromUserId` int(11) NULL DEFAULT NULL COMMENT '发送者(ID)',
   `createdTime` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `state` enum('UNREAD','READ','WITHDRAW','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL DEFAULT 'UNREAD' COMMENT '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_58500392580a2312a7c8faf313a`(`groupId` ASC) USING BTREE,
   INDEX `FK_a028d293a2fad8637ad79196566`(`fromUserId` ASC) USING BTREE,
   CONSTRAINT `FK_58500392580a2312a7c8faf313a` FOREIGN KEY (`groupId`) REFERENCES `group_chat` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_a028d293a2fad8637ad79196566` FOREIGN KEY (`fromUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of group_message
 -- ----------------------------
-INSERT INTO `group_message` VALUES (53, NULL, NULL, 'testadas', 14, 6, '2024-03-25 08:14:16.090451', 'UNREAD');
-INSERT INTO `group_message` VALUES (54, NULL, NULL, '79847+', 14, 12, '2024-03-25 08:14:41.067924', 'UNREAD');
-INSERT INTO `group_message` VALUES (55, NULL, NULL, 'adasdsad', 14, 1, '2024-03-25 08:14:49.608625', 'UNREAD');
-INSERT INTO `group_message` VALUES (56, NULL, NULL, '34', 14, 1, '2024-03-25 08:21:20.038450', 'UNREAD');
-INSERT INTO `group_message` VALUES (57, NULL, NULL, '5', 14, 1, '2024-03-25 08:23:58.193742', 'UNREAD');
-INSERT INTO `group_message` VALUES (58, NULL, NULL, '3', 14, 1, '2024-03-25 08:47:09.410280', 'UNREAD');
-INSERT INTO `group_message` VALUES (59, NULL, NULL, '321', 14, 1, '2024-03-25 08:47:18.669631', 'UNREAD');
-INSERT INTO `group_message` VALUES (60, NULL, NULL, '32', 14, 1, '2024-03-25 08:48:23.412778', 'UNREAD');
-INSERT INTO `group_message` VALUES (61, NULL, NULL, 'sad ', 14, 1, '2024-03-25 08:49:06.571521', 'UNREAD');
-INSERT INTO `group_message` VALUES (62, NULL, NULL, '5y', 14, 12, '2024-03-25 08:56:21.170294', 'UNREAD');
-INSERT INTO `group_message` VALUES (63, NULL, NULL, '45', 14, 1, '2024-03-25 08:57:01.074155', 'UNREAD');
-INSERT INTO `group_message` VALUES (64, NULL, NULL, 'dfg', 14, 1, '2024-03-25 09:01:35.429771', 'UNREAD');
-INSERT INTO `group_message` VALUES (65, NULL, NULL, 'fsd ', 14, 1, '2024-03-25 09:07:03.381232', 'UNREAD');
-INSERT INTO `group_message` VALUES (66, NULL, NULL, '56', 14, 1, '2024-03-25 09:15:34.833147', 'UNREAD');
-INSERT INTO `group_message` VALUES (67, NULL, NULL, '+++++', 14, 1, '2024-03-25 09:17:00.177721', 'UNREAD');
+INSERT INTO `group_message` VALUES (16, 'UNREAD', NULL, NULL, 'asdsadasd', 6, 1, '2024-05-10 05:43:58.878374');
+INSERT INTO `group_message` VALUES (17, 'UNREAD', NULL, NULL, '啊实打实打算', 7, 1, '2024-05-10 06:43:39.491885');
 
 -- ----------------------------
 -- Table structure for message
 -- ----------------------------
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE `message`  (
-  `postMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '聊天内容',
-  `state` enum('UNREAD','READ','WITHDRAW','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL DEFAULT 'UNREAD' COMMENT '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fileType` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '文件类型',
+  `fileSize` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '文件大小',
+  `postMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '聊天内容',
+  `state` enum('UNREAD','READ','WITHDRAW','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'UNREAD' COMMENT '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
+  `createdTime` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `fromUserId` int(11) NULL DEFAULT NULL COMMENT '发送者(ID)',
   `toUserId` int(11) NULL DEFAULT NULL COMMENT '接收者(ID)',
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fileType` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '文件类型',
-  `createdTime` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `fileSize` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '文件大小',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_96789153e31e0bb7885ea13a279`(`toUserId` ASC) USING BTREE,
   INDEX `FK_c59262513a3006fd8f58bb4b7c2`(`fromUserId` ASC) USING BTREE,
+  INDEX `FK_96789153e31e0bb7885ea13a279`(`toUserId` ASC) USING BTREE,
   CONSTRAINT `FK_96789153e31e0bb7885ea13a279` FOREIGN KEY (`toUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_c59262513a3006fd8f58bb4b7c2` FOREIGN KEY (`fromUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 272 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 121 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
 -- ----------------------------
-INSERT INTO `message` VALUES ('12', 'UNREAD', 1, 6, 228, NULL, '2024-03-24 12:54:37.346850', NULL);
-INSERT INTO `message` VALUES ('3', 'UNREAD', 6, 1, 229, NULL, '2024-03-24 12:55:39.883133', NULL);
-INSERT INTO `message` VALUES ('啊实打实打算', 'UNREAD', 6, 1, 230, NULL, '2024-03-24 12:59:08.810049', NULL);
-INSERT INTO `message` VALUES ('3A', 'UNREAD', 6, 1, 231, NULL, '2024-03-24 12:59:48.638798', NULL);
-INSERT INTO `message` VALUES ('1223r', 'UNREAD', 1, 6, 232, NULL, '2024-03-24 13:00:08.160145', NULL);
-INSERT INTO `message` VALUES ('3A123', 'UNREAD', 6, 1, 233, NULL, '2024-03-24 13:10:14.673270', NULL);
-INSERT INTO `message` VALUES ('23', 'UNREAD', 1, 6, 234, NULL, '2024-03-24 13:11:05.805103', NULL);
-INSERT INTO `message` VALUES ('3', 'UNREAD', 1, 6, 235, NULL, '2024-03-24 13:11:34.161538', NULL);
-INSERT INTO `message` VALUES ('发生的', 'UNREAD', 6, 1, 236, NULL, '2024-03-24 13:14:04.036903', NULL);
-INSERT INTO `message` VALUES ('66', 'UNREAD', 6, 1, 237, NULL, '2024-03-24 13:14:53.504435', NULL);
-INSERT INTO `message` VALUES ('23', 'UNREAD', 6, 1, 238, NULL, '2024-03-24 13:15:19.382255', NULL);
-INSERT INTO `message` VALUES ('345', 'UNREAD', 1, 6, 239, NULL, '2024-03-24 13:16:10.663582', NULL);
-INSERT INTO `message` VALUES ('123432', 'UNREAD', 1, 6, 240, NULL, '2024-03-24 13:16:35.336669', NULL);
-INSERT INTO `message` VALUES ('-=-', 'UNREAD', 1, 6, 241, NULL, '2024-03-24 13:22:15.328901', NULL);
-INSERT INTO `message` VALUES ('sdf', 'UNREAD', 1, 6, 242, NULL, '2024-03-24 13:22:33.813485', NULL);
-INSERT INTO `message` VALUES ('的风格', 'UNREAD', 6, 1, 243, NULL, '2024-03-24 13:24:30.117461', NULL);
-INSERT INTO `message` VALUES ('324234', 'UNREAD', 1, 6, 244, NULL, '2024-03-24 13:24:45.047402', NULL);
-INSERT INTO `message` VALUES ('345', 'UNREAD', 1, 6, 245, NULL, '2024-03-24 13:26:25.248015', NULL);
-INSERT INTO `message` VALUES ('给对方', 'UNREAD', 6, 1, 246, NULL, '2024-03-24 13:26:52.191579', NULL);
-INSERT INTO `message` VALUES ('234', 'UNREAD', 1, 6, 247, NULL, '2024-03-24 13:29:10.001854', NULL);
-INSERT INTO `message` VALUES ('2343', 'UNREAD', 1, 6, 248, NULL, '2024-03-24 13:29:32.307262', NULL);
-INSERT INTO `message` VALUES ('345', 'UNREAD', 1, 6, 249, NULL, '2024-03-24 13:30:32.117700', NULL);
-INSERT INTO `message` VALUES ('6', 'UNREAD', 1, 6, 250, NULL, '2024-03-24 13:31:09.577834', NULL);
-INSERT INTO `message` VALUES ('4', 'UNREAD', 1, 6, 251, NULL, '2024-03-24 13:33:27.476616', NULL);
-INSERT INTO `message` VALUES ('54', 'UNREAD', 1, 6, 252, NULL, '2024-03-24 13:34:35.995795', NULL);
-INSERT INTO `message` VALUES ('iuy', 'UNREAD', 1, 6, 253, NULL, '2024-03-24 13:34:57.491328', NULL);
-INSERT INTO `message` VALUES ('7456756', 'UNREAD', 1, 6, 254, NULL, '2024-03-24 13:35:18.372016', NULL);
-INSERT INTO `message` VALUES ('567', 'UNREAD', 1, 6, 255, NULL, '2024-03-24 13:35:40.963335', NULL);
-INSERT INTO `message` VALUES ('123', 'UNREAD', 1, 6, 256, NULL, '2024-03-24 13:37:46.228251', NULL);
-INSERT INTO `message` VALUES ('2342 ', 'UNREAD', 1, 6, 257, NULL, '2024-03-24 13:40:34.399210', NULL);
-INSERT INTO `message` VALUES ('y', 'UNREAD', 1, 6, 258, NULL, '2024-03-24 13:43:13.608736', NULL);
-INSERT INTO `message` VALUES ('yi', 'UNREAD', 1, 6, 259, NULL, '2024-03-24 13:43:32.914470', NULL);
-INSERT INTO `message` VALUES ('456', 'UNREAD', 1, 6, 260, NULL, '2024-03-24 13:47:20.548923', NULL);
-INSERT INTO `message` VALUES ('345', 'UNREAD', 6, 1, 261, NULL, '2024-03-24 13:47:45.139514', NULL);
-INSERT INTO `message` VALUES ('5', 'UNREAD', 1, 6, 262, NULL, '2024-03-24 13:50:30.643229', NULL);
-INSERT INTO `message` VALUES ('556', 'UNREAD', 1, 6, 263, NULL, '2024-03-24 13:51:07.386563', NULL);
-INSERT INTO `message` VALUES ('5', 'UNREAD', 1, 6, 264, NULL, '2024-03-24 13:52:00.793519', NULL);
-INSERT INTO `message` VALUES ('34', 'UNREAD', 1, 6, 265, NULL, '2024-03-24 13:55:03.437265', NULL);
-INSERT INTO `message` VALUES ('456', 'UNREAD', 1, 6, 266, NULL, '2024-03-24 13:55:46.228009', NULL);
-INSERT INTO `message` VALUES ('123', 'UNREAD', 1, 6, 267, NULL, '2024-03-24 13:59:19.997470', NULL);
-INSERT INTO `message` VALUES ('4543', 'UNREAD', 1, 6, 268, NULL, '2024-03-24 14:14:00.742897', NULL);
-INSERT INTO `message` VALUES ('678', 'UNREAD', 1, 6, 269, NULL, '2024-03-24 14:14:27.172266', NULL);
-INSERT INTO `message` VALUES ('12', 'UNREAD', 1, 6, 270, NULL, '2024-03-24 14:19:39.979923', NULL);
-INSERT INTO `message` VALUES ('234', 'UNREAD', 1, 6, 271, NULL, '2024-03-25 09:21:42.830950', NULL);
+INSERT INTO `message` VALUES (112, NULL, NULL, 'fhg', 'UNREAD', '2024-05-09 02:07:16.110033', 1, 3);
+INSERT INTO `message` VALUES (113, NULL, NULL, '45', 'READ', '2024-05-09 02:56:02.950074', 1, 2);
+INSERT INTO `message` VALUES (114, NULL, NULL, 'dfdsfg', 'READ', '2024-05-09 02:57:45.326710', 2, 1);
+INSERT INTO `message` VALUES (115, NULL, NULL, 'sdf', 'READ', '2024-05-09 03:00:42.225220', 2, 1);
+INSERT INTO `message` VALUES (116, NULL, NULL, 'sdfdfgdfg', 'READ', '2024-05-09 03:00:54.171260', 2, 1);
+INSERT INTO `message` VALUES (117, NULL, NULL, 'sdfdfgdfgasdas', 'READ', '2024-05-09 03:01:15.696465', 2, 1);
+INSERT INTO `message` VALUES (118, NULL, NULL, 'dfg', 'READ', '2024-05-09 03:02:38.149121', 2, 1);
+INSERT INTO `message` VALUES (119, NULL, NULL, '1', 'READ', '2024-05-09 03:03:21.728149', 2, 1);
+INSERT INTO `message` VALUES (120, NULL, NULL, 'fd', 'UNREAD', '2024-05-09 03:03:36.887525', 1, 2);
 
 -- ----------------------------
 -- Table structure for notice
@@ -233,15 +160,15 @@ INSERT INTO `message` VALUES ('234', 'UNREAD', 1, 6, 271, NULL, '2024-03-25 09:2
 DROP TABLE IF EXISTS `notice`;
 CREATE TABLE `notice`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `updateTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  `state` enum('UNREAD','READ','WITHDRAW','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL DEFAULT 'UNREAD' COMMENT '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
-  `newMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL COMMENT '最新的信息',
-  `fromUserId` int(11) NULL DEFAULT NULL COMMENT '发送者(ID)',
-  `toUserId` int(11) NULL DEFAULT NULL COMMENT '接收者(ID)',
-  `msgType` enum('ONE_FOR_ONE','MANY_TO_MANY') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL DEFAULT 'ONE_FOR_ONE' COMMENT '私聊=ONE_FOR_ONE 群聊=MANY_TO_MANY',
-  `groupId` int(11) NULL DEFAULT NULL COMMENT '群id/同时是接收者id',
   `friendMsgNumber` int(11) NULL DEFAULT NULL COMMENT '对方发给我，我这边未读信息数量',
   `userMsgNumber` int(11) NULL DEFAULT NULL COMMENT '自己发送给对方，对方未读信息数量',
+  `msgType` enum('ONE_FOR_ONE','MANY_TO_MANY') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'ONE_FOR_ONE' COMMENT '私聊=ONE_FOR_ONE 群聊=MANY_TO_MANY',
+  `updateTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  `state` enum('UNREAD','READ','WITHDRAW','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'UNREAD' COMMENT '聊天记录状态：未读:UNREAD,已读 :READ,撤回:WITHDRAW,删除:DELETE',
+  `newMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '最新的信息',
+  `fromUserId` int(11) NULL DEFAULT NULL COMMENT '发送者(ID)',
+  `toUserId` int(11) NULL DEFAULT NULL COMMENT '接收者(ID)',
+  `groupId` int(11) NULL DEFAULT NULL COMMENT '群id/同时是接收者id',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `IDX_74b0f15aa3a83f8ef25f053ff0`(`toUserId` ASC, `fromUserId` ASC) USING BTREE,
   INDEX `FK_e3b1ce8ea3457922ac3d9266ba3`(`fromUserId` ASC) USING BTREE,
@@ -249,14 +176,15 @@ CREATE TABLE `notice`  (
   CONSTRAINT `FK_392760210d977325dc85150ceab` FOREIGN KEY (`toUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_be9e12d1b6007810eacb135a964` FOREIGN KEY (`groupId`) REFERENCES `group_chat` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_e3b1ce8ea3457922ac3d9266ba3` FOREIGN KEY (`fromUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 87 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of notice
 -- ----------------------------
-INSERT INTO `notice` VALUES (83, '2024-03-25 09:21:43.000000', 'UNREAD', '234', 1, 6, 'ONE_FOR_ONE', NULL, 0, 0);
-INSERT INTO `notice` VALUES (85, '2024-03-25 09:17:00.000000', 'UNREAD', 'fsd', 1, NULL, 'MANY_TO_MANY', 14, NULL, NULL);
-INSERT INTO `notice` VALUES (86, '2024-03-25 06:34:48.294805', 'UNREAD', '', 1, NULL, 'MANY_TO_MANY', 13, NULL, NULL);
+INSERT INTO `notice` VALUES (25, NULL, NULL, 'ONE_FOR_ONE', '2024-05-09 03:03:36.000000', 'UNREAD', 'fd', 1, 2, NULL);
+INSERT INTO `notice` VALUES (26, NULL, NULL, 'ONE_FOR_ONE', '2024-05-09 03:00:49.516206', 'UNREAD', '', 1, 3, NULL);
+INSERT INTO `notice` VALUES (27, NULL, NULL, 'MANY_TO_MANY', '2024-05-10 05:43:58.000000', 'UNREAD', 'asdsadasd', 1, NULL, 6);
+INSERT INTO `notice` VALUES (28, NULL, NULL, 'MANY_TO_MANY', '2024-05-10 06:43:39.000000', 'UNREAD', '啊实打实打算', 1, NULL, 7);
 
 -- ----------------------------
 -- Table structure for user
@@ -264,34 +192,33 @@ INSERT INTO `notice` VALUES (86, '2024-03-25 06:34:48.294805', 'UNREAD', '', 1, 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户名',
+  `nickname` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '昵称',
+  `headerImg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '头像',
+  `password` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '密码',
   `gender` int(11) NOT NULL COMMENT '性别',
-  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '用户名',
-  `password` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NULL DEFAULT NULL COMMENT '密码',
-  `nickname` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL COMMENT '昵称',
-  `headerImg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL COMMENT '头像',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `IDX_065d4d8f3b5adb4a08841eae3c`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 1, 'test1', '675a3867bd36ed867d480551c1000dc4', 'test1', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (6, 0, 'test2', '675a3867bd36ed867d480551c1000dc4', 'test2', '');
-INSERT INTO `user` VALUES (7, 0, 'test3', '675a3867bd36ed867d480551c1000dc4', 'test3', '');
-INSERT INTO `user` VALUES (8, 0, 'test4', '675a3867bd36ed867d480551c1000dc4', 'test4', '');
-INSERT INTO `user` VALUES (11, 1, '子则就人南', '675a3867bd36ed867d480551c1000dc4', '子则就人南', 'https://tupian.qqw21.com/article/UploadPic/2021-4/20214720294413745.jpg');
-INSERT INTO `user` VALUES (12, 1, '联回门系该', '675a3867bd36ed867d480551c1000dc4', '联回门系该', '');
-INSERT INTO `user` VALUES (13, 0, '较回见', '675a3867bd36ed867d480551c1000dc4', '较回见', '');
-INSERT INTO `user` VALUES (14, 1, '潘艳', '675a3867bd36ed867d480551c1000dc4', '潘艳', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (15, 0, '深且如说须', '675a3867bd36ed867d480551c1000dc4', '张超', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (16, 1, '看相族', '675a3867bd36ed867d480551c1000dc4', '毛涛', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (17, 1, '里县美一业第', '675a3867bd36ed867d480551c1000dc4', '宋平', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (18, 1, '听水区比要', '675a3867bd36ed867d480551c1000dc4', '龚秀英', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (19, 0, '等色术越', '675a3867bd36ed867d480551c1000dc4', '胡强', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (20, 1, '后体么价', '675a3867bd36ed867d480551c1000dc4', '雷勇', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (21, 0, '对该件', '675a3867bd36ed867d480551c1000dc4', '毛霞', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (22, 1, '团么属工圆然其', '675a3867bd36ed867d480551c1000dc4', '曾涛', 'http://dummyimage.com/400x400');
-INSERT INTO `user` VALUES (23, 1, '里行部选', '675a3867bd36ed867d480551c1000dc4', '宋艳', 'http://dummyimage.com/400x400');
+INSERT INTO `user` VALUES (1, '产克太市花月', '孔秀兰', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (2, '数斯常老力条', '丁平', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 1);
+INSERT INTO `user` VALUES (3, '子需统论其族切', '贾敏', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 1);
+INSERT INTO `user` VALUES (4, '不土般需候八', '李强', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (5, '还京严我飞油', '杨娟', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 2);
+INSERT INTO `user` VALUES (6, '候说位解前温去', '侯磊', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (7, '况品会再', '何丽', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (8, '员速增地速的', '袁艳', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 1);
+INSERT INTO `user` VALUES (9, '分已照说', '苏磊', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (10, '较行你级', '姚秀兰', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 2);
+INSERT INTO `user` VALUES (11, '长几青直', '胡敏', 'http://dummyimage.com/400x400', '12531fe7eb88a448b9e457eaf6cc2bc6', 1);
+INSERT INTO `user` VALUES (12, '明严属对', '陆强', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (13, '断今或用南整', '龙磊', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 1);
+INSERT INTO `user` VALUES (14, '严该口低厂组', '张超', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
+INSERT INTO `user` VALUES (15, '现得交联农', '林丽', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 1);
+INSERT INTO `user` VALUES (16, '自龙完子调人', '任勇', 'http://dummyimage.com/400x400', '675a3867bd36ed867d480551c1000dc4', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
