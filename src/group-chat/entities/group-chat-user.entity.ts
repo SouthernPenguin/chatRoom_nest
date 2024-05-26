@@ -1,7 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { GroupChat } from './group-chat.entity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class GroupChatUser {
@@ -21,13 +19,9 @@ export class GroupChatUser {
   @Column({ type: 'int', nullable: true, comment: '消息数量' })
   msgNumber: number;
 
-  // @ManyToOne(() => User, (user) => user.groupChatUser, {
-  //   createForeignKeyConstraints: false,
-  // })
-  // user: User;
+  @Column({ type: 'timestamp', nullable: true, comment: '进入聊天室时间' })
+  enterTime: Date;
 
-  // @ManyToOne(() => GroupChat, (user) => user.groupChatUser, {
-  //   createForeignKeyConstraints: false,
-  // })
-  // groupChat: GroupChat;
+  @Column({ type: 'timestamp', nullable: true, comment: '离开聊天室时间' })
+  exitTime: Date;
 }

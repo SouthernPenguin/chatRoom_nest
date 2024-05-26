@@ -19,6 +19,7 @@ import { MessageEnum } from 'src/enum';
 import { ListGroupMessageDto } from './dto/list-group-message.dto';
 import { WsGateway } from 'src/ws/ws.gateway';
 import { BackMessageDto } from './dto/back-message.dto';
+import { EnterExitTime } from 'src/group-chat/dto/enter-exit-time.dto';
 
 @Controller('group-message')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
@@ -94,6 +95,20 @@ export class GroupMessageController {
     );
 
     return res;
+  }
+
+  @Post('/recordEnterExitTime')
+  @ApiOperation({ summary: '记录进入群和离开群时间' })
+  @ApiBody({ type: EnterExitTime, description: '' })
+  async upEnterExitTime(
+    @Req() req: Request,
+    @Body() enterExitTime: EnterExitTime,
+  ) {
+    const currentUser = await getTokenUser(req); // 当前用户
+    this.groupMessageService.upDateEnterExitTime(
+      currentUser?.id,
+      enterExitTime,
+    );
   }
 
   @Delete(':id')

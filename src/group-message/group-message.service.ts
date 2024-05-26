@@ -8,13 +8,15 @@ import { ListGroupMessageDto } from './dto/list-group-message.dto';
 import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { RedisService } from 'src/redis/redis.service';
+import { GroupChatService } from 'src/group-chat/group-chat.service';
+import { EnterExitTime } from 'src/group-chat/dto/enter-exit-time.dto';
 
 @Injectable()
 export class GroupMessageService {
   constructor(
     @InjectRepository(GroupMessage)
     private groupMessageRepository: Repository<GroupMessage>,
-    private groupChatService: GroupChatUserService,
+    private groupChatService: GroupChatService,
     private notificationService: NotificationService,
     private groupChatUserService: GroupChatUserService,
     private redisService: RedisService,
@@ -128,7 +130,7 @@ export class GroupMessageService {
   }
 
   async update(userId: number, id: number, state: MessageEnum) {
-    const groupUserId = await this.groupChatService.selectUser(userId);
+    const groupUserId = await this.groupChatUserService.selectUser(userId);
 
     if (!groupUserId.userId) {
       throw new BadRequestException('此用户不在群里中');
@@ -172,6 +174,13 @@ export class GroupMessageService {
         return '已删除';
       }
     }
+  }
+
+  async upDateEnterExitTime(userId: number, enterExitTime: EnterExitTime) {
+    return await this.groupChatUserService.updateEnterTimeExitTime(
+      userId,
+      enterExitTime,
+    );
   }
 
   // 当前用户消息列表;
