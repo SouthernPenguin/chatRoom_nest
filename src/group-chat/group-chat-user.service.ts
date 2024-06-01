@@ -27,7 +27,7 @@ export class GroupChatUserService {
   async updateMsgNumber(
     groupChatId: number,
     msgNumber: number,
-    userId?: number,
+    userId?: number[],
   ) {
     await this.groupChatUserRepository
       .createQueryBuilder()
@@ -36,7 +36,43 @@ export class GroupChatUserService {
         msgNumber,
       })
       .where('groupChatId = :id', { id: groupChatId })
-      .andWhere('userId <> :userId', {
+      .andWhere('userId NOT In(:userId)', {
+        userId: userId,
+      })
+      .execute();
+  }
+
+  // 批量跟新
+  async updateUsersStatusComplex(
+    groupChatId: number,
+    updateData: { msgNumber: number; userId: number }[],
+  ) {
+    for await (const item of updateData) {
+      this.groupChatRepository
+        .createQueryBuilder()
+        .update(GroupChatUser)
+        .set({ msgNumber: item.msgNumber })
+        .where('groupChatId = :id', { id: groupChatId })
+        .andWhere('userId = :userId', {
+          userId: item.userId,
+        })
+        .execute();
+    }
+  }
+
+  updateSingleMsgNumber(
+    groupChatId: number,
+    msgNumber: number,
+    userId?: number,
+  ) {
+    this.groupChatUserRepository
+      .createQueryBuilder()
+      .update(GroupChatUser)
+      .set({
+        msgNumber,
+      })
+      .where('groupChatId = :id', { id: groupChatId })
+      .andWhere('userId = :userId', {
         userId: userId,
       })
       .execute();

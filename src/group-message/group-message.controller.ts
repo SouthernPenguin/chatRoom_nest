@@ -48,11 +48,15 @@ export class GroupMessageController {
     // 聊天记录
     this.ws.server.emit(
       'activeTowUsers',
-      await this.findOne(createGroupMessageDto.groupId, {
-        page: 1,
-        limit: 10,
-        createdTime: [],
-      }),
+      await this.findOne(
+        createGroupMessageDto.groupId,
+        {
+          page: 1,
+          limit: 10,
+          createdTime: [],
+        },
+        req,
+      ),
     );
 
     return res;
@@ -67,6 +71,11 @@ export class GroupMessageController {
     @Req() req?: Request,
   ) {
     const currentUser = await getTokenUser(req); // 当前用户
+    this.groupMessageService.updateGroupUserMsgNumber(
+      Number(id),
+      0,
+      currentUser.id,
+    );
     return this.groupMessageService.findAll(
       id,
       listGroupMessage,

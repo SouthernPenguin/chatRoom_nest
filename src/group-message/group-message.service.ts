@@ -10,6 +10,7 @@ import { NotificationService } from 'src/notification/notification.service';
 import { RedisService } from 'src/redis/redis.service';
 import { GroupChatService } from 'src/group-chat/group-chat.service';
 import { EnterExitTime } from 'src/group-chat/dto/enter-exit-time.dto';
+import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 
 @Injectable()
 export class GroupMessageService {
@@ -32,20 +33,42 @@ export class GroupMessageService {
     const res = await this.groupMessageRepository.create(createGroupMessageDto);
     const returnRes = await this.groupMessageRepository.save(res);
 
-    const r = await this.groupMessageRepository
+    const r = (await this.groupMessageRepository
       .createQueryBuilder('group-message')
       .select('count(*) as msgNumber')
-      .where('groupId = :groupId', { groupId: createGroupMessageDto.groupId })
-      // .andWhere('group-message.state = :state', { state: MessageEnum.未读 })
-      // .andWhere('fromUserId <> :fromUserId', {
-      //   fromUserId: createGroupMessageDto.fromUserId,
-      // })
-      .getRawOne();
+      .addSelect('gcu.userId', 'userId')
+      .leftJoin(GroupChatUser, 'gcu', 'group-message.groupId = gcu.groupChatId')
+      .where('gcu.exitTime IS NULL AND gcu.enterTime IS NULL')
+      .orWhere(
+        '(group-message.createdTime > gcu.exitTime AND group-message.fromUserId <> gcu.userId)',
+      )
+      .groupBy('gcu.userId')
+      .getRawMany()) as { userId: number; msgNumber: number }[];
 
-    await this.groupChatUserService.updateMsgNumber(
+    // 正在群中聊天用户
+    const allRedisList = await this.redisService.getAllActiveUser();
+    const allRedisListParse = allRedisList.map((item: string) =>
+      JSON.parse(item),
+    ) as { msgType: MessageEnum; userId: number; toUserId: number }[];
+    let usersId: number[] = [];
+
+    if (
+      allRedisListParse.filter(
+        (item) => item.toUserId === createGroupMessageDto.groupId,
+      ).length > 1
+    ) {
+      usersId = allRedisListParse.map((item) => item.userId);
+    }
+
+    r.forEach((item) => {
+      if (usersId.some((i) => i === item.userId)) {
+        item.msgNumber = 0;
+      }
+    });
+
+    await this.groupChatUserService.updateUsersStatusComplex(
       createGroupMessageDto.groupId,
-      r.msgNumber,
-      createGroupMessageDto.fromUserId,
+      r,
     );
 
     if (returnRes?.id) {
@@ -86,6 +109,7 @@ export class GroupMessageService {
       .andWhere('group-message.groupId = :id', { id })
       .leftJoinAndSelect('group-message.fromUser', 'fromUserId');
 
+    // 读取缓存
     const allRedisList = await this.redisService.getAllActiveUser();
     const allRedisListParse = allRedisList.map((item: string) =>
       JSON.parse(item),
@@ -129,6 +153,19 @@ export class GroupMessageService {
     } as unknown;
   }
 
+  async updateGroupUserMsgNumber(
+    groupChatId: number,
+    msgNumber: number,
+    userId?: number,
+  ) {
+    this.groupChatUserService.updateSingleMsgNumber(
+      groupChatId,
+      msgNumber,
+      userId,
+    );
+  }
+
+  // 更新撤回，删除
   async update(userId: number, id: number, state: MessageEnum) {
     const groupUserId = await this.groupChatUserService.selectUser(userId);
 

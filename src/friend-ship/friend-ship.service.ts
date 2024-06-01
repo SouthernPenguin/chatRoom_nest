@@ -120,7 +120,7 @@ export class FriendShipService {
     }
   }
 
-  async selectUnreadNumber(notices: Notice[]) {
+  async selectUnreadNumber(notices: Notice[], currentUserId: number) {
     if (notices.length) {
       for await (const item of notices) {
         if (item.msgType === ChatType.私聊) {
@@ -138,7 +138,7 @@ export class FriendShipService {
           const res = await this.groupChatUserService.findOne(item.toUsers.id);
           if (res.length) {
             const msgNumber = res.filter(
-              (i) => i.msgNumber > 0,
+              (i) => i.msgNumber > 0 && i.userId === currentUserId,
             ) as GroupChatUser[];
 
             item.friendMsgNumber = msgNumber.length
