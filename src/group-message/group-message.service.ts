@@ -148,7 +148,7 @@ export class GroupMessageService {
 
     return {
       content,
-      totalElements: count,
+      totalElements: Math.ceil(count / limit),
       totalPages: Number(page || 1),
     } as unknown;
   }
