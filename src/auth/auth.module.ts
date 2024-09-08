@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import redConfigFile from 'src/utils/redConfigFile';
+import { SystemUserModule } from 'src/ststem-user/ststem-user.module';
 
 const mySqlConfig: any = redConfigFile();
 
@@ -17,6 +18,7 @@ const jwtModule = JwtModule.register({
 @Module({
   imports: [
     UserModule,
+    SystemUserModule,
     jwtModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
