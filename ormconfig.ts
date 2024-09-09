@@ -8,6 +8,9 @@ import { Notice } from 'src/notification/entities/notice.entity';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import { GroupMessage } from 'src/group-message/entities/group-message.entity';
 import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
+import { Menu } from 'src/menu/entities/menu.entity';
+import { Role } from 'src/role/entities/role.entity';
+import { SystemUser } from 'src/ststem-user/entities/ststem-user.entity';
 
 const mySqlConfig: any = redConfigFile();
 
@@ -23,12 +26,15 @@ export const connectionParams = {
     User,
     FriendShip,
     Message,
+    Menu,
     Notice,
+    Role,
+    SystemUser,
     GroupChat,
     GroupMessage,
     GroupChatUser,
   ], // 导入的实体(数据库模型)
-  synchronize: false,
+  synchronize: true,
   // 日志等级
   logging: true, //['query', 'error'],
 } as TypeOrmModuleOptions;
