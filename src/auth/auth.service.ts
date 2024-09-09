@@ -39,12 +39,17 @@ export class AuthService {
       loginAuthDto.password,
     );
     if (!res) {
-      return '账号密码错误';
+      throw new BadRequestException('账号密码错误');
     }
-    const payload = { username: res.name, id: res.id };
+    const token = await this.jwtService.signAsync({
+      username: res.name,
+      id: res.id,
+      roleId: res.roles.map((r) => r.id),
+    });
+
     return {
       userInfo: res,
-      token: this.jwtService.sign(payload),
+      token,
     };
   }
 }
