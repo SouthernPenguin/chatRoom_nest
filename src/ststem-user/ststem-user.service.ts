@@ -84,8 +84,8 @@ export class SystemUserService {
     // 按钮权限
     const buttonList: string[] = [];
     menus.map((item) => {
-      if (item.node_type === 3) {
-        buttonList.push(item.menu_code);
+      if (item.nodeType === 3) {
+        buttonList.push(item.menuCode);
       }
     });
     // 菜单列表
