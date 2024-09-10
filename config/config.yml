@@ -14,7 +14,7 @@ REDIS:
   prot: 6379
 
 # 启动端口
-PORT: 8468
+PORT: 8768
 
 # 静态文件目录
 PREFIX: '/files/'
