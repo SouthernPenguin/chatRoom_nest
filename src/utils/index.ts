@@ -29,7 +29,7 @@ export const menuTree = (
   const returnList: any[] = [];
   list.forEach((item) => {
     if (
-      item.parent_id === parentId &&
+      item.parentId === parentId &&
       (item.isDeleted === 0 || !item.isDeleted)
     ) {
       item.children = menuTree(list, item.id);
