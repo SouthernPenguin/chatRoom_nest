@@ -26,6 +26,9 @@ import { FilesModule } from './files/files.module';
 import { GroupChatModule } from './group-chat/group-chat.module';
 import { GroupMessageModule } from './group-message/group-message.module';
 import { RedisModule } from './redis/redis.module';
+import { MenuModule } from './menu/menu.module';
+import { RoleModule } from './role/role.module';
+import { SystemUserModule } from './ststem-user/ststem-user.module';
 
 @Module({
   imports: [
@@ -64,6 +67,9 @@ import { RedisModule } from './redis/redis.module';
     GroupChatModule,
     GroupMessageModule,
     RedisModule,
+    MenuModule,
+    RoleModule,
+    SystemUserModule,
   ],
   controllers: [],
   providers: [
