@@ -20,7 +20,7 @@ export class CreateMenuDto {
 
   @ApiProperty({
     example: 0,
-    description: '节点类型：0目录 1菜单 3按钮',
+    description: '节点类型：0目录 1菜单 2按钮',
   })
   @IsNumber()
   @IsNotEmpty({ groups: ['create'], message: '菜单编码必须填写' })

@@ -11,12 +11,14 @@ import {
   UseGuards,
   Req,
   UseFilters,
+  Query,
 } from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -34,6 +36,17 @@ import { TypeormFilter } from 'src/filters/typeorm.filter';
 @ApiTags('菜单模块')
 export class MenusController {
   constructor(private readonly menusService: MenusService) {}
+
+  @Get('/findFirstStage')
+  @ApiOperation({ summary: '一级菜单' })
+  @ApiResponse({
+    status: 200,
+    description: '成功返回200，失败返回400',
+    type: [CreateMenuDto],
+  })
+  async findFirstStage() {
+    return await this.menusService.findFirstStage();
+  }
 
   @Get('/detail/:id')
   @ApiOperation({ summary: '菜单详情' })
@@ -61,14 +74,18 @@ export class MenusController {
 
   @Get()
   @ApiOperation({ summary: '全部菜单' })
+  @ApiQuery({ name: 'isTree', description: '是否放回菜单树', type: Boolean })
   @ApiResponse({
     status: 200,
     description: '成功返回200，失败返回400',
     type: [CreateMenuDto],
   })
-  async findAll(@Req() req: Request) {
+  async findAll(@Req() req: Request, @Query('isTree') isTree: string) {
     const currentUser = await getTokenUser(req);
-    return this.menusService.findAll(currentUser.roleId as number[]);
+    return this.menusService.findAll(
+      currentUser.roleId as number[],
+      JSON.parse(isTree),
+    );
   }
 
   @Get(':id')

@@ -1,10 +1,14 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { Menu } from './entities/menu.entity';
-import { menuTree } from '../utils';
 import { Role } from 'src/role/entities/role.entity';
+import { menuTree } from 'src/utils';
 
 @Injectable()
 export class MenusService {
@@ -17,25 +21,59 @@ export class MenusService {
   ) {}
 
   async create(createMenuDto: CreateMenuDto) {
+    const find = await this.menuRepository.findOne({
+      where: { name: createMenuDto.name },
+    });
+    if (find?.id) {
+      throw new BadRequestException('菜单名称重复');
+    }
     return this.menuRepository.save(createMenuDto);
   }
 
-  async findAll(roleId: number[]) {
+  async findAll(roleId: number[], isTree: boolean = false) {
     const res = await this.roleRepository.findOne({
       where: {
         id: In(roleId),
       },
       relations: ['menus'],
     });
-
-    return menuTree(
-      res.menus.filter((i) => !i.isDeleted),
-      0,
-    );
+    const filterMenu = res.menus.filter((i) => !i.isDeleted);
+    if (isTree) {
+      return menuTree(filterMenu, 0);
+    } else {
+      return filterMenu;
+    }
   }
 
   findChildren(id: number) {
-    return this.menuRepository.find({ where: { parentId: id } });
+    return this.menuRepository.find({
+      where: { parentId: id, isDeleted: IsNull() },
+      order: {
+        sort: 'ASC',
+      },
+    });
+  }
+
+  // 一级菜单
+  async findFirstStage() {
+    const res = await this.menuRepository.query(
+      `
+      SELECT
+        t1.*,
+      CASE
+          WHEN EXISTS ( SELECT 1 FROM menu t2 WHERE t2.parentId = t1.id ) THEN
+          ${true} ELSE ${false}
+        END AS hasChildren 
+      FROM
+        menu t1 
+      WHERE
+        t1.nodeType = ? AND ISNULL(isDeleted)
+      ORDER BY
+        sort asc;
+      `,
+      [0],
+    );
+    return res;
   }
 
   findOne(id: number) {
@@ -59,8 +97,8 @@ export class MenusService {
     }
     menuRes.isDeleted = true;
     const newMenu = await this.menuRepository.merge(menuRes);
-    this.menuRepository.save(newMenu);
-    if (newMenu.id) {
+    const r = await this.menuRepository.save(newMenu);
+    if (r.id) {
       return {};
     }
   }

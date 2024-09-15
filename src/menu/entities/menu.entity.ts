@@ -14,7 +14,7 @@ export class Menu {
   @Column({ comment: '权限表示' })
   menuCode: string;
 
-  @Column({ comment: '节点类型：0目录 1菜单 3按钮' })
+  @Column({ comment: '节点类型：0目录 1菜单 2按钮' })
   nodeType: number;
 
   @Column({ comment: '路由' })
