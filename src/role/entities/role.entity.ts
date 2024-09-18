@@ -2,6 +2,7 @@ import { Menu } from 'src/menu/entities/menu.entity';
 import { SystemUser } from 'src/ststem-user/entities/ststem-user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -19,6 +20,9 @@ export class Role {
 
   @Column({ comment: '角色姓名', unique: true })
   name: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdTime: Date;
 
   @ManyToMany(() => SystemUser, (systemUser) => systemUser.roles)
   systemUsers: SystemUser[];

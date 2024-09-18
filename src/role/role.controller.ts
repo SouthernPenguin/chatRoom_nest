@@ -10,6 +10,7 @@ import {
   ClassSerializerInterceptor,
   UseGuards,
   Query,
+  UseFilters,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -23,8 +24,11 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { RolesService } from './role.service';
 import { GetRoleDto } from './dto/get-role.dto';
 import { JwtGuard } from 'src/global/guard/jwt.guards';
+import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
+import { TypeormFilter } from 'src/filters/typeorm.filter';
 
 @Controller('roles')
+@UseFilters(HttpExceptionFilter, TypeormFilter)
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtGuard) // 校验token是否通过
 @ApiTags('角色模块')

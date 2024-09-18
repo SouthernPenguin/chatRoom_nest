@@ -30,14 +30,28 @@ export class MenusService {
     return this.menuRepository.save(createMenuDto);
   }
 
-  async findAll(roleId: number[], isTree: boolean = false) {
-    const res = await this.roleRepository.findOne({
-      where: {
-        id: In(roleId),
-      },
-      relations: ['menus'],
-    });
-    const filterMenu = res.menus.filter((i) => !i.isDeleted);
+  async findAll(
+    roleId: number[],
+    isTree: boolean = false,
+    isAdmin: boolean = false,
+  ) {
+    let res = null;
+
+    if (isAdmin) {
+      res = await this.menuRepository.find();
+    } else {
+      res = await this.roleRepository.findOne({
+        where: {
+          id: In(roleId),
+        },
+        relations: ['menus'],
+      });
+    }
+
+    const filterMenu = isAdmin
+      ? res.filter((i) => !i.isDeleted)
+      : res.menus.filter((i) => !i.isDeleted);
+
     if (isTree) {
       return menuTree(filterMenu, 0);
     } else {

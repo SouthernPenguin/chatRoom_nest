@@ -85,6 +85,7 @@ export class MenusController {
     return this.menusService.findAll(
       currentUser.roleId as number[],
       JSON.parse(isTree),
+      currentUser.username === 'admin' ? true : false,
     );
   }
 

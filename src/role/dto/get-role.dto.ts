@@ -19,8 +19,11 @@ export class GetRoleDto {
 
 // swagger 返回dto
 export class ReturnGetRoleList {
-  @ApiProperty({ type: [CreateRoleDto], description: '列表内容' })
-  content: CreateRoleDto[];
+  @ApiProperty({
+    type: [{ name: String, id: Number }],
+    description: '列表内容',
+  })
+  content: { name: string; id: number }[];
   @ApiProperty({ description: '页码' })
   totalElements: number;
   @ApiProperty({ description: '页数' })

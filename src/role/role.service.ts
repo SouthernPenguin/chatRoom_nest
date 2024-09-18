@@ -37,6 +37,7 @@ export class RolesService {
     const content = await queryBuilder
       .skip((page - 1) * limit || 0)
       .take(limit || 10)
+      .orderBy('id', 'ASC')
       .getMany();
     return {
       content,
