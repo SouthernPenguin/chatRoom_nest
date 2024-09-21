@@ -72,8 +72,9 @@ export class SystemUserController {
     return this.systemUserService.findDetail(id);
   }
 
-  @Patch()
+  @Patch(':id')
   @ApiOperation({ summary: '系统用户更新' })
+  @ApiParam({ name: 'id', required: true, description: '当前用户id' })
   @ApiBody({ type: UpdateSystemUserDto, description: '' })
   @ApiResponse({
     status: 200,
@@ -82,9 +83,8 @@ export class SystemUserController {
   })
   async update(
     @Body() updateSystemUserDto: UpdateSystemUserDto,
-    @Req() req: Request,
+    @Param('id') id: number,
   ) {
-    const currentUser = await getTokenUser(req); // 当前用户
-    return this.systemUserService.update(currentUser.id, updateSystemUserDto);
+    return this.systemUserService.update(id, updateSystemUserDto);
   }
 }

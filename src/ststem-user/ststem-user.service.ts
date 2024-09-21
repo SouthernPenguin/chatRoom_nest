@@ -46,6 +46,7 @@ export class SystemUserService {
     const count = await newQueryBuilder.getCount();
     const content = await newQueryBuilder
       .leftJoinAndSelect('system_user.roles', 'role')
+      // .select(['system_user', 'role.id'])
       .skip((page - 1) * limit || 0)
       .take(limit || 10)
       .getMany();
@@ -108,7 +109,7 @@ export class SystemUserService {
       updateSystemUserDto.roleIds,
     );
     updateSystemUserDto.roles = list;
-    const tes = Object.assign(res, updateSystemUserDto);
+    const tes = await this.systemUserRepository.merge(res, updateSystemUserDto);
     return this.systemUserRepository.save(tes);
   }
 
