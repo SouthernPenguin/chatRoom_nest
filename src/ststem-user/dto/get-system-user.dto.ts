@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { CreateSystemUserDto } from './create-ststem-user.dto';
+import { ReturnListDto } from './create-ststem-user.dto';
 
 // 用户模糊搜索
 export class GetSystemUserDto {
@@ -19,8 +19,8 @@ export class GetSystemUserDto {
 
 // swagger 返回dto
 export class ReturnSystemUserDto {
-  @ApiProperty({ type: [CreateSystemUserDto], description: '列表内容' })
-  content: CreateSystemUserDto[];
+  @ApiProperty({ type: [ReturnListDto], description: '列表内容' })
+  content: ReturnListDto[];
   @ApiProperty({ description: '页码' })
   totalElements: number;
   @ApiProperty({ description: '页数' })

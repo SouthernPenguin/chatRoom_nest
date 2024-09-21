@@ -53,7 +53,7 @@ export class SystemUserService {
     return {
       content,
       totalElements: count,
-      totalPages: Number(page | 1),
+      totalPages: Math.ceil(count / limit),
     };
   }
 
