@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -17,6 +18,9 @@ export class SystemUser {
 
   @Column({ comment: '账号', unique: true })
   name: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdTime: Date;
 
   @Column({ comment: '密码' })
   @Exclude()
