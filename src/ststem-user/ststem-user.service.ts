@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GetSystemUserDto } from './dto/get-system-user.dto';
@@ -8,7 +12,10 @@ import { SystemUser } from './entities/ststem-user.entity';
 import { CreateSystemUserDto } from './dto/create-ststem-user.dto';
 import { conditionUtilsSelect } from 'src/utils/db.help';
 import { Menu } from 'src/menu/entities/menu.entity';
-import { UpdateSystemUserDto } from './dto/update-ststem-user.dto';
+import {
+  ChangeSystemUserPasswordDto,
+  UpdateSystemUserDto,
+} from './dto/update-ststem-user.dto';
 
 @Injectable()
 export class SystemUserService {
@@ -111,6 +118,29 @@ export class SystemUserService {
     updateSystemUserDto.roles = list;
     const tes = await this.systemUserRepository.merge(res, updateSystemUserDto);
     return this.systemUserRepository.save(tes);
+  }
+
+  async updatePassword(
+    id: number,
+    updateSystemUserDto: ChangeSystemUserPasswordDto,
+  ) {
+    const res = await this.findOne(id);
+    if (!res.id) {
+      throw new ForbiddenException('用户不存在');
+    }
+    const oldPassword = encrypt(updateSystemUserDto.oldPassword);
+    if (oldPassword !== res.password) {
+      throw new BadRequestException('旧密码不正确');
+    }
+    const changeRes = await this.systemUserRepository
+      .createQueryBuilder('system_user')
+      .update(SystemUser)
+      .set({ password: encrypt(updateSystemUserDto.newPassword) })
+      .where({ id })
+      .execute();
+    if (changeRes.affected) {
+      return '修改成功';
+    }
   }
 
   findOne(id: number) {

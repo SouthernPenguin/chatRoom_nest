@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import { Role } from 'src/role/entities/role.entity';
 
 export class UpdateSystemUserDto {
@@ -20,4 +20,18 @@ export class UpdateSystemUserDto {
   roleIds: number[];
 
   roles: Role[];
+}
+
+export class ChangeSystemUserPasswordDto {
+  @ApiProperty({ example: '老密码', description: '老密码' })
+  @IsString()
+  @Length(6)
+  @IsNotEmpty({ message: '老密码必须填写' })
+  oldPassword: string;
+
+  @ApiProperty({ example: '新密码', description: '新密码' })
+  @IsString()
+  @Length(6)
+  @IsNotEmpty({ message: '新密码必须填写' })
+  newPassword: string;
 }

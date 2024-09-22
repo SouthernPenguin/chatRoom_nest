@@ -26,8 +26,10 @@ import {
 import { JwtGuard } from 'src/global/guard/jwt.guards';
 import { SystemUserService } from './ststem-user.service';
 import { CreateSystemUserDto } from './dto/create-ststem-user.dto';
-import { UpdateSystemUserDto } from './dto/update-ststem-user.dto';
-import { getTokenUser } from 'src/utils';
+import {
+  ChangeSystemUserPasswordDto,
+  UpdateSystemUserDto,
+} from './dto/update-ststem-user.dto';
 
 @Controller('system-user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,6 +37,25 @@ import { getTokenUser } from 'src/utils';
 @ApiTags('系统用户')
 export class SystemUserController {
   constructor(private readonly systemUserService: SystemUserService) {}
+
+  @Patch('/changePassword/:id')
+  @ApiOperation({ summary: '系统用户修改密码' })
+  @ApiParam({ name: 'id', required: true, description: '当前用户id' })
+  @ApiBody({ type: ChangeSystemUserPasswordDto, description: '' })
+  @ApiResponse({
+    status: 200,
+    description: '成功返回200，失败返回400',
+    type: ChangeSystemUserPasswordDto,
+  })
+  async upPassword(
+    @Body() changeSystemUserPasswordDto: ChangeSystemUserPasswordDto,
+    @Param('id') id: number,
+  ) {
+    return this.systemUserService.updatePassword(
+      id,
+      changeSystemUserPasswordDto,
+    );
+  }
 
   @Post()
   @ApiOperation({ summary: '创建系统用户' })

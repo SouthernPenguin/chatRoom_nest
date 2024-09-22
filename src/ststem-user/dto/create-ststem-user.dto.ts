@@ -1,6 +1,6 @@
 export class CreateStstemUserDto {}
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Role } from 'src/role/entities/role.entity';
 
 export class CreateSystemUserDto {
@@ -9,9 +9,6 @@ export class CreateSystemUserDto {
   @IsNotEmpty({ groups: ['create'], message: '账号必须填写' })
   name: string;
 
-  @ApiProperty({ example: '密码', description: '密码' })
-  @IsString()
-  @IsOptional()
   password: string;
 
   @ApiProperty({ example: '角色名', description: '角色名' })
