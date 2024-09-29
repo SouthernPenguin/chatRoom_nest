@@ -21,7 +21,12 @@ export class AuthService {
     const payload = { username: res.name, id: res.id };
     return {
       userInfo: res,
-      token: this.jwtService.sign(payload),
+      token: this.jwtService.sign(payload, {
+        expiresIn: '1h', //1小时过期，这里短点方便验证
+      }),
+      refreshToken: this.jwtService.sign(payload, {
+        expiresIn: '7d', //7天过期
+      }),
     };
   }
 
