@@ -54,9 +54,9 @@ export class CreateUserDto {
 
   @IsNumber()
   @IsEnum(
-    { 男: 0, 女: 1, 保密: 2 },
+    { 男: 0, 女: 1 },
     {
-      message: 'gender只能传入数字0或1,2',
+      message: 'gender只能传入数字0或1',
     },
   )
   @Type(() => Number)

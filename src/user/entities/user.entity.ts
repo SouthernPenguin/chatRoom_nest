@@ -1,13 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
-import {
-  Column,
-  Entity,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 // 用户
 @Entity()
 export class User {
