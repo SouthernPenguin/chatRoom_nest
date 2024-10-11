@@ -9,7 +9,7 @@
       "request": "launch",
       "runtimeArgs": ["run-script", "start:debug"],
       "runtimeExecutable": "npm",
-      "runtimeVersion": "18.0.0",
+      "runtimeVersion": "22.0.0",
       "internalConsoleOptions": "neverOpen",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
