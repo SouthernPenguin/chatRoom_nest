@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -49,19 +41,11 @@ export class CreateUserDto {
     name: 'password',
     type: String,
   })
-  @IsNotEmpty({ groups: ['create'], message: '密码必须填写' })
+  @IsNotEmpty({ groups: ['create'], message: '密码必须填写且大于等于6位' })
   password: string;
 
-  @IsNumber()
-  @IsEnum(
-    { 男: 0, 女: 1 },
-    {
-      message: 'gender只能传入数字0或1',
-    },
-  )
-  @Type(() => Number)
   @ApiProperty({
-    description: '性别：男: 0, 女: 1, 保密: 2',
+    description: '性别：男: 0, 女: 1',
     example: 0,
     name: 'gender',
     type: Number,
