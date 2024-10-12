@@ -10,21 +10,16 @@ import { GetUserDto } from './dto/get-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
   async findAll(query: GetUserDto) {
     const { page, limit, blur } = query;
 
     const queryBuilder = await this.userRepository.createQueryBuilder('user');
     if (blur) {
-      queryBuilder.andWhere(
-        '(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)',
-        {
-          searchQuery: `%${blur}%`,
-        },
-      );
+      queryBuilder.andWhere('(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)', {
+        searchQuery: `%${blur}%`,
+      });
     }
     const count = await queryBuilder.getCount();
     const content = await queryBuilder
@@ -83,12 +78,9 @@ export class UserService {
     const queryBuilder = await this.userRepository.createQueryBuilder('user');
 
     return await queryBuilder
-      .where(
-        '(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)  ',
-        {
-          searchQuery: `%${name}%`,
-        },
-      )
+      .where('(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)  ', {
+        searchQuery: `%${name}%`,
+      })
       .andWhere(' (user.id <> :id)', {
         id: id,
       })

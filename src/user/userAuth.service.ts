@@ -8,9 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserAuthService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
   // 创建用户
   async create(createUserDto: CreateUserDto) {

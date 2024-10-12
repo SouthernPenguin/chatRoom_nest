@@ -8,7 +8,6 @@ import { ChatType, FriendShipEnum } from 'src/enum';
 import { UserService } from 'src/user/user.service';
 import { Notice } from 'src/notification/entities/notice.entity';
 import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
-import { Length } from 'class-validator';
 import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 
 @Injectable()
@@ -47,10 +46,7 @@ export class FriendShipService {
       throw new BadRequestException('用户不存在');
     }
 
-    const friend = await this.isFriend(
-      createFriendShipDto.userId,
-      createFriendShipDto.friendId,
-    );
+    const friend = await this.isFriend(createFriendShipDto.userId, createFriendShipDto.friendId);
 
     if (id === createFriendShipDto.fromUserId && friend && friend?.id) {
       throw new BadRequestException('已发起好友请求，请等待对方通过');
@@ -85,9 +81,7 @@ export class FriendShipService {
    * @param activeChatUser 当前正在聊天用户
    */
 
-  async upUserMsgNumber(
-    msgNumber: { userId: number; msgNumber: number | string }[],
-  ) {
+  async upUserMsgNumber(msgNumber: { userId: number; msgNumber: number | string }[]) {
     if (!msgNumber.length) {
       throw new BadRequestException('');
     }
@@ -95,22 +89,19 @@ export class FriendShipService {
     //查询好友关系
     const res = await this.friendShipRepository
       .createQueryBuilder('friend-ship')
-      .where(
-        'friend-ship.sortedKey = :sortedKey1 or friend-ship.sortedKey = :sortedKey2',
-        {
-          sortedKey1: `${msgNumber[0].userId}-${msgNumber[1].userId}`,
-          sortedKey2: `${msgNumber[1].userId}-${msgNumber[0].userId}`,
-        },
-      )
+      .where('friend-ship.sortedKey = :sortedKey1 or friend-ship.sortedKey = :sortedKey2', {
+        sortedKey1: `${msgNumber[0].userId}-${msgNumber[1].userId}`,
+        sortedKey2: `${msgNumber[1].userId}-${msgNumber[0].userId}`,
+      })
       .getOne();
 
     if (res) {
-      const userRes = msgNumber.filter((i) => i.userId === res.userId);
+      const userRes = msgNumber.filter(i => i.userId === res.userId);
       if (userRes.length) {
         res.userMsgNumber = Number(userRes[0].msgNumber);
       }
 
-      const friendRes = msgNumber.filter((i) => i.userId === res.friendId);
+      const friendRes = msgNumber.filter(i => i.userId === res.friendId);
       if (friendRes.length) {
         res.friendMsgNumber = Number(friendRes[0].msgNumber);
       }
@@ -124,10 +115,7 @@ export class FriendShipService {
     if (notices.length) {
       for await (const item of notices) {
         if (item.msgType === ChatType.私聊) {
-          const msgNumber = await this.isFriend(
-            item.fromUser.id,
-            item.toUser.id,
-          );
+          const msgNumber = await this.isFriend(item.fromUser.id, item.toUser.id);
           if (msgNumber) {
             item.friendMsgNumber = msgNumber.friendMsgNumber;
             item.userMsgNumber = msgNumber.userMsgNumber;
@@ -137,13 +125,9 @@ export class FriendShipService {
         if (item.msgType === ChatType.群聊) {
           const res = await this.groupChatUserService.findOne(item.toUsers.id);
           if (res.length) {
-            const msgNumber = res.filter(
-              (i) => i.msgNumber > 0 && i.userId === currentUserId,
-            ) as GroupChatUser[];
+            const msgNumber = res.filter(i => i.msgNumber > 0 && i.userId === currentUserId) as GroupChatUser[];
 
-            item.friendMsgNumber = msgNumber.length
-              ? msgNumber[0].msgNumber
-              : 0;
+            item.friendMsgNumber = msgNumber.length ? msgNumber[0].msgNumber : 0;
           }
         }
       }
@@ -154,18 +138,15 @@ export class FriendShipService {
   async selectUserFriend(id: number) {
     const allFriends = await this.friendShipRepository
       .createQueryBuilder('friend_ship')
-      .where(
-        '(friend_ship.userId = :userId or friend_ship.friendId = :userId) and friend_ship.state <> :state',
-        {
-          userId: id,
-          state: FriendShipEnum.发起,
-        },
-      )
+      .where('(friend_ship.userId = :userId or friend_ship.friendId = :userId) and friend_ship.state <> :state', {
+        userId: id,
+        state: FriendShipEnum.发起,
+      })
       .getMany();
 
     if (allFriends.length) {
       const res = await this.userAuthService.selectAllUser(
-        allFriends.map((item) => {
+        allFriends.map(item => {
           if (item.friendId == id) {
             return item.userId;
           }
@@ -186,7 +167,7 @@ export class FriendShipService {
 
   async findAllFriend() {
     const res = await this.friendShipRepository.find();
-    res.forEach((item) => {
+    res.forEach(item => {
       if (item.createdTime) {
         item.createdTime = new Date(item.createdTime).toLocaleString() as any;
       }

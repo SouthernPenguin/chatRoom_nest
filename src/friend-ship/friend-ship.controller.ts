@@ -1,23 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseFilters,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseFilters } from '@nestjs/common';
 import { FriendShipService } from './friend-ship.service';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
@@ -61,18 +44,10 @@ export class FriendShipController {
     summary: '添加好友 前端socket对应名称：awaitFriend(等待通过好友列表) ',
   })
   @ApiBody({ type: CreateFriendShipDto, description: '' })
-  async create(
-    @Req() req: Request,
-    @Body(CreatedFriendShipPipe) createFriendShipDto: CreateFriendShipDto,
-  ) {
-    const res = await this.friendShipService.addUser(
-      req['user']['id'],
-      createFriendShipDto,
-    );
+  async create(@Req() req: Request, @Body(CreatedFriendShipPipe) createFriendShipDto: CreateFriendShipDto) {
+    const res = await this.friendShipService.addUser(req['user']['id'], createFriendShipDto);
 
-    const ss = await this.friendShipService.selectAwaitFriend(
-      createFriendShipDto.toUserId,
-    );
+    const ss = await this.friendShipService.selectAwaitFriend(createFriendShipDto.toUserId);
     if (res.state === FriendShipEnum.发起) {
       this.ws.server.emit('awaitFriend', ss);
     }
@@ -113,10 +88,7 @@ export class FriendShipController {
   @ApiOperation({ summary: '查找好友' })
   async findFriend(@Req() req: Request, @Query() query: FindFriend) {
     return {
-      content: await this.friendShipService.selectUser(
-        req['user']['id'],
-        query.name,
-      ),
+      content: await this.friendShipService.selectUser(req['user']['id'], query.name),
     };
   }
 }
