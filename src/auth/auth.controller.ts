@@ -1,10 +1,10 @@
-import { Controller, Post, Body, UseFilters } from '@nestjs/common';
+import { Controller, Post, Body, UseFilters, Get, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
-import { LoginAuthDto } from './dto/login-auth.dto';
+import { LoginAuthDto, RefreshDto } from './dto/login-auth.dto';
 import { Public } from 'src/global/decorator/publice.decorator';
 import { CreateSystemUserDto } from 'src/ststem-user/dto/create-ststem-user.dto';
 
@@ -28,6 +28,17 @@ export class AuthController {
   @ApiBody({ type: CreateUserDto, description: '' })
   register(@Body() createAuthDto: CreateUserDto) {
     return this.authService.register(createAuthDto);
+  }
+
+  @Public()
+  @Post('/refresh')
+  @ApiOperation({ summary: '刷新token' })
+  @ApiBody({
+    type: RefreshDto,
+    description: ' ',
+  })
+  refresh(@Body() refreshToken: RefreshDto) {
+    return this.authService.refresh(refreshToken.refresh);
   }
 
   @Public()

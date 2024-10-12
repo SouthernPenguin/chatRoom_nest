@@ -22,3 +22,15 @@ export class LoginAuthDto {
   @IsNotEmpty({ message: '密码必须填写' })
   password: string;
 }
+
+export class RefreshDto {
+  @IsString()
+  @ApiProperty({
+    example: '',
+    description: 'refresh',
+    name: 'refresh',
+    type: String,
+  })
+  @IsNotEmpty({ message: 'refresh必须填写' })
+  refresh: string;
+}
