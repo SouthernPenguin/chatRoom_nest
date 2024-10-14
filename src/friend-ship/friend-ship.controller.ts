@@ -7,10 +7,7 @@ import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
 import { CreatedFriendShipPipe } from './pipe/created-friend-ship.pipe';
 import { WsGateway } from 'src/ws/ws.gateway';
 import { FriendShipEnum } from 'src/enum';
-
-interface FindFriend {
-  name: string;
-}
+import { GetFriendDto } from './dto/select-friend-ship';
 
 @Controller('friend-ship')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
@@ -20,12 +17,6 @@ export class FriendShipController {
     private readonly friendShipService: FriendShipService,
     private readonly ws: WsGateway,
   ) {}
-
-  // 获取添加分页
-  // @Get('/list')
-  // allFriends() {
-  //   return this.friendShipService.findAllFriend();
-  // }
 
   @Get('/list')
   @ApiOperation({ summary: '用户好友列表' })
@@ -79,16 +70,9 @@ export class FriendShipController {
   }
 
   @Get()
-  @ApiQuery({
-    name: 'name',
-    description: '用户名',
-    required: true,
-    type: String,
-  })
+  @ApiQuery({ type: GetFriendDto, description: '参数可选' })
   @ApiOperation({ summary: '查找好友' })
-  async findFriend(@Req() req: Request, @Query() query: FindFriend) {
-    return {
-      content: await this.friendShipService.selectUser(req['user']['id'], query.name),
-    };
+  async findFriend(@Req() req: Request, @Query() query: GetFriendDto) {
+    return await this.friendShipService.selectUser(req['user']['id'], query);
   }
 }

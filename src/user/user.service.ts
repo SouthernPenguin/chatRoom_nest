@@ -7,6 +7,7 @@ import { User } from './entities/user.entity';
 import { UpUserPassWord } from './dto/update.userPassWord';
 import { encrypt } from 'src/utils/crypto';
 import { GetUserDto } from './dto/get-user.dto';
+import { GetFriendDto } from 'src/friend-ship/dto/select-friend-ship';
 
 @Injectable()
 export class UserService {
@@ -74,16 +75,27 @@ export class UserService {
     return new BadRequestException('学生不存在！');
   }
 
-  async selectUser(id: number, name: string) {
+  async selectUser(id: number, query: GetFriendDto) {
+    const { page, limit, name } = query;
     const queryBuilder = await this.userRepository.createQueryBuilder('user');
 
-    return await queryBuilder
+    const count = await queryBuilder
       .where('(user.name LIKE :searchQuery OR user.nickname LIKE :searchQuery)  ', {
         searchQuery: `%${name}%`,
       })
       .andWhere(' (user.id <> :id)', {
         id: id,
       })
+      .getCount();
+
+    const content = await queryBuilder
+      .skip((page - 1) * limit || 0)
+      .take(limit || 10)
       .getMany();
+    return {
+      content,
+      totalElements: count,
+      totalPages: Math.ceil(count / limit),
+    };
   }
 }

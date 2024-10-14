@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { Notice } from 'src/notification/entities/notice.entity';
 import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
 import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
+import { GetFriendDto } from './dto/select-friend-ship';
 
 @Injectable()
 export class FriendShipService {
@@ -20,8 +21,9 @@ export class FriendShipService {
     private groupChatUserService: GroupChatUserService,
   ) {}
 
-  async selectUser(id: number, name: string) {
-    return await this.userService.selectUser(id, name);
+  async selectUser(id: number, query: GetFriendDto) {
+    if (!query.name) throw new BadRequestException('请输入用户名');
+    return await this.userService.selectUser(id, query);
   }
 
   async selectAwaitFriend(toUserId: number) {
