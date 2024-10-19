@@ -8,12 +8,7 @@ import { WsModule } from 'src/ws/ws.module';
 import { GroupChatModule } from 'src/group-chat/group-chat.module';
 
 @Module({
-  imports: [
-    UserModule,
-    TypeOrmModule.forFeature([FriendShip]),
-    GroupChatModule,
-    WsModule,
-  ],
+  imports: [UserModule, TypeOrmModule.forFeature([FriendShip]), GroupChatModule, WsModule],
   controllers: [FriendShipController],
   providers: [FriendShipService],
   exports: [FriendShipService],
