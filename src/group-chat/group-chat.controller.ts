@@ -1,14 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Req,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Req, UseFilters } from '@nestjs/common';
 import { GroupChatService } from './group-chat.service';
+
 import { CreateGroupChatDto } from './dto/create-group-chat.dto';
 import { UpdateGroupChatDto } from './dto/update-group-chat.dto';
 import { getTokenUser } from 'src/utils';
@@ -26,15 +18,9 @@ export class GroupChatController {
   @Post()
   @ApiOperation({ summary: '创建群' })
   @ApiBody({ type: CreateGroupChatDto, description: '' })
-  async create(
-    @Req() req: Request,
-    @Body(new CreatedGroupChatPipe()) createGroupChatDto: CreateGroupChatDto,
-  ) {
+  async create(@Req() req: Request, @Body(new CreatedGroupChatPipe()) createGroupChatDto: CreateGroupChatDto) {
     const currentUser = await getTokenUser(req);
-    return await this.groupChatService.create(
-      currentUser.id,
-      createGroupChatDto,
-    );
+    return await this.groupChatService.create(currentUser.id, createGroupChatDto);
   }
 
   @Get()
@@ -55,10 +41,7 @@ export class GroupChatController {
   @ApiOperation({ summary: '更新群名称/公告' })
   @ApiParam({ name: 'id', required: true, description: '群id' })
   @ApiBody({ type: UpdateGroupChatDto, description: '' })
-  update(
-    @Param('id') id: number,
-    @Body() updateGroupChatDto: UpdateGroupChatDto,
-  ) {
+  update(@Param('id') id: number, @Body() updateGroupChatDto: UpdateGroupChatDto) {
     return this.groupChatService.update(id, updateGroupChatDto);
   }
 }
