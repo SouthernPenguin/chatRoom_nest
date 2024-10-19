@@ -26,11 +26,11 @@ export class FriendShipService {
     return await this.userService.selectUser(id, query);
   }
 
-  async selectAwaitFriend(toUserId: number) {
+  async selectAwaitFriend(friendId: number) {
     const res = await this.friendShipRepository.find({
       where: {
-        toUserId,
-        // state: FriendShipEnum.发起,
+        friendId,
+        state: FriendShipEnum.发起,
       },
     });
     return {
@@ -38,19 +38,19 @@ export class FriendShipService {
     };
   }
 
-  async addUser(id: number, createFriendShipDto: CreateFriendShipDto) {
-    const allUsers = await this.userAuthService.selectAllUser([
-      createFriendShipDto.friendId,
-      createFriendShipDto.userId,
-    ]);
+  /*
+   * currentUer：当前用户
+   * */
+  async addUser(currentuserId: number, createFriendShipDto: CreateFriendShipDto) {
+    const allUsers = await this.userAuthService.selectAllUser([createFriendShipDto.friendId]);
 
-    if (allUsers.length < 2) {
+    if (!allUsers.length) {
       throw new BadRequestException('用户不存在');
     }
 
-    const friend = await this.isFriend(createFriendShipDto.userId, createFriendShipDto.friendId);
+    const friend = await this.isFriend(currentuserId, createFriendShipDto.friendId, FriendShipEnum.发起);
 
-    if (id === createFriendShipDto.fromUserId && friend && friend?.id) {
+    if (friend && friend.fromUserId === currentuserId && friend.state == FriendShipEnum.发起) {
       throw new BadRequestException('已发起好友请求，请等待对方通过');
     }
 
@@ -58,9 +58,16 @@ export class FriendShipService {
       throw new BadRequestException('已经是好友关系');
     }
 
+    // 如果双方同时添加对方好友，直接通过
+    if (friend && friend.fromUserId !== currentuserId) {
+      return await this.upUserState(friend.id, FriendShipEnum.通过);
+    }
+
     // 创建好友
-    const res = await this.friendShipRepository.create({
+    const res = this.friendShipRepository.create({
       ...createFriendShipDto,
+      userId: currentuserId,
+      sortedKey: `${currentuserId}-${createFriendShipDto.friendId}`,
       notes: createFriendShipDto.notes,
     });
     return this.friendShipRepository.save(res);
@@ -178,16 +185,26 @@ export class FriendShipService {
   }
 
   // 判断是否为好友
-  async isFriend(userId: number, friendId: number) {
-    return this.friendShipRepository
-      .createQueryBuilder('friend_ship')
-      .where(
-        '(friend_ship.userId = :userId and friend_ship.friendId = :friendId) or (friend_ship.userId = :friendId and friend_ship.friendId = :userId)',
-        {
+  async isFriend(userId: number, friendId: number, state?: FriendShipEnum) {
+    const queryBuilder = this.friendShipRepository.createQueryBuilder('friend_ship');
+    const slqString = state
+      ? 'friend_ship.state = :state and  (friend_ship.userId = :userId and friend_ship.friendId = :friendId) or (friend_ship.userId = :friendId and friend_ship.friendId = :userId)'
+      : '(friend_ship.userId = :userId and friend_ship.friendId = :friendId) or (friend_ship.userId = :friendId and friend_ship.friendId = :userId)';
+    if (state) {
+      return queryBuilder
+        .where(slqString, {
           userId,
           friendId,
-        },
-      )
-      .getOne();
+          state,
+        })
+        .getOne();
+    } else {
+      return queryBuilder
+        .where(slqString, {
+          userId,
+          friendId,
+        })
+        .getOne();
+    }
   }
 }

@@ -4,15 +4,15 @@ import { FriendShipEnum } from 'src/enum';
 
 export class CreateFriendShipDto {
   // 后面直接从token中获取
-  @IsNumber()
-  @IsNotEmpty({ message: '用户id不能为空' })
-  @ApiProperty({
-    example: '',
-    description: '用户id',
-    name: 'userId',
-    type: String,
-  })
-  userId: number;
+  // @IsNumber()
+  // @IsNotEmpty({ message: '用户id不能为空' })
+  // @ApiProperty({
+  //   example: '',
+  //   description: '用户id',
+  //   name: 'userId',
+  //   type: String,
+  // })
+  // userId: number;
 
   @IsNumber()
   @IsNotEmpty({ message: '好友id不能为空' })
@@ -34,15 +34,15 @@ export class CreateFriendShipDto {
   })
   fromUserId: number;
 
-  @IsNotEmpty({ message: '接收者id' })
-  @IsNumber()
-  @ApiProperty({
-    example: '',
-    description: '接收者id',
-    name: 'toUserId',
-    type: Number,
-  })
-  toUserId: number;
+  // @IsNotEmpty({ message: '接收者id' })
+  // @IsNumber()
+  // @ApiProperty({
+  //   example: '',
+  //   description: '接收者id',
+  //   name: 'toUserId',
+  //   type: Number,
+  // })
+  // toUserId: number;
 
   @ApiProperty({
     example: '',

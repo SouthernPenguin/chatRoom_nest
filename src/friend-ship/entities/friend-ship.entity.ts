@@ -1,14 +1,6 @@
 import { FriendShipEnum } from 'src/enum';
 import { User } from 'src/user/entities/user.entity';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  Index,
-  CreateDateColumn,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index, CreateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 // 好友关系列表
 @Entity()
@@ -47,21 +39,21 @@ export class FriendShip {
   })
   fromUserId: number;
   // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, user => user.id, { eager: true })
   @JoinColumn({ name: 'fromUserId' })
   fromUser: User;
 
-  @Column({
-    type: 'int',
-    comment: '接收者(ID)',
-    name: 'toUserId',
-    nullable: true,
-  })
-  toUserId: number;
-  // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
-  @JoinColumn({ name: 'toUserId' })
-  toUser: User;
+  // @Column({
+  //   type: 'int',
+  //   comment: '接收者(ID)',
+  //   name: 'toUserId',
+  //   nullable: true,
+  // })
+  // toUserId: number;
+  // // 外键
+  // @ManyToOne(() => User, user => user.id, { eager: true })
+  // @JoinColumn({ name: 'toUserId' })
+  // toUser: User;
 
   @Column({ type: 'varchar', nullable: true, comment: '备注' })
   notes: string;

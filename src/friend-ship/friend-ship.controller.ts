@@ -38,7 +38,7 @@ export class FriendShipController {
   async create(@Req() req: Request, @Body(CreatedFriendShipPipe) createFriendShipDto: CreateFriendShipDto) {
     const res = await this.friendShipService.addUser(req['user']['id'], createFriendShipDto);
 
-    const ss = await this.friendShipService.selectAwaitFriend(createFriendShipDto.toUserId);
+    const ss = await this.friendShipService.selectAwaitFriend(req['user']['id'] as number);
     if (res.state === FriendShipEnum.发起) {
       this.ws.server.emit('awaitFriend', ss);
     }
