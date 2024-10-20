@@ -3,7 +3,7 @@ import { UserAuthService } from 'src/user/userAuth.service';
 import { CreateFriendShipDto } from './dto/create-friend-ship.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendShip } from './entities/friend-ship.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ChatType, FriendShipEnum } from 'src/enum';
 import { UserService } from 'src/user/user.service';
 import { Notice } from 'src/notification/entities/notice.entity';
@@ -30,7 +30,7 @@ export class FriendShipService {
     const res = await this.friendShipRepository.find({
       where: {
         friendId,
-        state: FriendShipEnum.发起,
+        state: In([FriendShipEnum.发起, FriendShipEnum.通过]),
       },
     });
     return {
