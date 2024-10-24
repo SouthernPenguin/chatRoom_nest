@@ -18,14 +18,11 @@ export class GroupChatService {
   ) {}
 
   async create(userId: number, createGroupChatDto: CreateGroupChatDto) {
-    const userList = await this.userAuthService.selectAllUser([
-      ...createGroupChatDto.userIds,
-      userId,
-    ]);
+    const userList = await this.userAuthService.selectAllUser([...createGroupChatDto.userIds, userId]);
     const userList1 = await this.userAuthService.selectAllUser([userId]);
     createGroupChatDto.users = userList;
     createGroupChatDto.createdUserId = userList1[0];
-    const res = await this.groupChatRepository.create(createGroupChatDto);
+    const res = this.groupChatRepository.create(createGroupChatDto);
     return this.groupChatRepository.save(res);
   }
 
@@ -53,14 +50,10 @@ export class GroupChatService {
 
     const res = await this.groupChatUserRepository.findOne(id);
 
-    const selectUser = await this.userAuthService.selectAllUser(
-      res.map((item) => item.userId),
-    );
+    const selectUser = await this.userAuthService.selectAllUser(res.map(item => item.userId));
 
-    res.map((item) => {
-      item['userInform'] = selectUser.filter(
-        (user) => user.id == item.userId,
-      )[0];
+    res.map(item => {
+      item['userInform'] = selectUser.filter(user => user.id == item.userId)[0];
       item['GroupLeader'] = item.userId == groupChatRes.createdUserId.id;
     });
     return res;

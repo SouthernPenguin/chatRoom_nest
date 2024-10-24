@@ -17,18 +17,11 @@ export class GroupChatUserService {
 
   // 详情
   async findOne(groupChatId: number) {
-    return this.groupChatUserRepository
-      .createQueryBuilder('group_chat_user')
-      .where({ groupChatId })
-      .getMany();
+    return this.groupChatUserRepository.createQueryBuilder('group_chat_user').where({ groupChatId }).getMany();
   }
 
   // 更新信息数量
-  async updateMsgNumber(
-    groupChatId: number,
-    msgNumber: number,
-    userId?: number[],
-  ) {
+  async updateMsgNumber(groupChatId: number, msgNumber: number, userId?: number[]) {
     await this.groupChatUserRepository
       .createQueryBuilder()
       .update(GroupChatUser)
@@ -43,10 +36,7 @@ export class GroupChatUserService {
   }
 
   // 批量跟新
-  async updateUsersStatusComplex(
-    groupChatId: number,
-    updateData: { msgNumber: number; userId: number }[],
-  ) {
+  async updateUsersStatusComplex(groupChatId: number, updateData: { msgNumber: number; userId: number }[]) {
     for await (const item of updateData) {
       this.groupChatRepository
         .createQueryBuilder()
@@ -60,11 +50,7 @@ export class GroupChatUserService {
     }
   }
 
-  updateSingleMsgNumber(
-    groupChatId: number,
-    msgNumber: number,
-    userId?: number,
-  ) {
+  updateSingleMsgNumber(groupChatId: number, msgNumber: number, userId?: number) {
     this.groupChatUserRepository
       .createQueryBuilder()
       .update(GroupChatUser)
