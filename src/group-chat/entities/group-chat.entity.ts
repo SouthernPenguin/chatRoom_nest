@@ -24,11 +24,11 @@ export class GroupChat {
   notice: string;
 
   // 创建人
-  @ManyToOne(() => User, (user) => user.groupChats)
+  @ManyToOne(() => User, (user: User) => user.groupChats)
   @JoinColumn({ name: 'createdUserId' })
   createdUserId: User;
 
-  @ManyToMany(() => User, (user) => user.groupChats)
+  @ManyToMany(() => User, (user: User) => user.groupChats)
   @JoinTable({
     name: 'group_chat_user',
   })
