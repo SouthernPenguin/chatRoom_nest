@@ -27,16 +27,18 @@ export class GroupChatService {
   }
 
   async findAll(userId: number) {
-    return await this.groupChatRepository
-      .createQueryBuilder('group_chat')
-      .select(['group_chat.id', 'group_chat.name'])
-      .leftJoinAndSelect('group_chat.users', 'users')
-      .leftJoinAndSelect('group_chat.createdUserId', 'createdUser')
-      .where('group_chat.createdUserId = :userId', {
-        userId,
-      })
-      .orWhere('users.id = :userId', { userId })
-      .getMany();
+    return {
+      content: await this.groupChatRepository
+        .createQueryBuilder('group_chat')
+        .select(['group_chat.id', 'group_chat.name', 'group_chat.notice'])
+        .leftJoinAndSelect('group_chat.users', 'users')
+        // .leftJoinAndSelect('group_chat.createdUserId', 'createdUser')
+        .where('group_chat.createdUserId = :userId', {
+          userId,
+        })
+        .orWhere('users.id = :userId', { userId })
+        .getMany(),
+    };
   }
 
   async findOne(id: number) {
