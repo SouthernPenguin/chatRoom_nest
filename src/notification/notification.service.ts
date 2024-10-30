@@ -23,10 +23,7 @@ export class NotificationService {
   async create(createDto: CreateDto) {
     try {
       if (createDto.msgType === ChatType.私聊) {
-        const res = await this.bothNotice(
-          createDto.fromUserId,
-          createDto.toUserId,
-        );
+        const res = await this.bothNotice(createDto.fromUserId, createDto.toUserId);
         if (res?.id) {
           this.update(res.id, createDto);
         } else {
@@ -58,13 +55,10 @@ export class NotificationService {
         .leftJoinAndSelect('notice.toUser', 'toUser')
         .leftJoinAndSelect('notice.fromUser', 'fromUser')
         .leftJoinAndSelect('notice.toUsers', 'toUsers')
-        .where(
-          '(notice.fromUserId = :id or notice.toUserId = :id) and state != :state',
-          {
-            id,
-            state: 'DELETE',
-          },
-        )
+        .where('(notice.fromUserId = :id or notice.toUserId = :id) and state != :state', {
+          id,
+          state: 'DELETE',
+        })
         .orWhere(
           'notice.fromUserId IN ( SELECT userId FROM group_chat_user WHERE group_chat_user.groupChatId = notice.groupId ) ',
         )
