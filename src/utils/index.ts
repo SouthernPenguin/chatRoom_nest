@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 type token = { username: string; id: number; roleId: number[] };
 export const getTokenUser = async (req: Request): Promise<token> => {
   if (req && 'user' in req) {
@@ -21,20 +23,30 @@ export const formatFileSize = (bytes: number) => {
  * @param parentId 分类id
  * @returns Array
  */
-export const menuTree = (
-  list: any[],
-  parentId: number | null,
-): any[] | string => {
+export const menuTree = (list: any[], parentId: number | null): any[] | string => {
   if (list.length < 0) return '请传入数组';
   const returnList: any[] = [];
-  list.forEach((item) => {
-    if (
-      item.parentId === parentId &&
-      (item.isDeleted === 0 || !item.isDeleted)
-    ) {
+  list.forEach(item => {
+    if (item.parentId === parentId && (item.isDeleted === 0 || !item.isDeleted)) {
       item.children = menuTree(list, item.id);
       returnList.push(item);
     }
   });
   return returnList;
+};
+
+/**
+ * @description: 生成文件上传文件夹
+ * @param {string} filePath
+ */
+export const checkDirAndCreate = (filePath: string): void => {
+  const pathArr = filePath.split('/');
+  let checkPath = '.';
+  let item: string;
+  for (item of pathArr) {
+    checkPath += `/${item}`;
+    if (!fs.existsSync(checkPath)) {
+      fs.mkdirSync(checkPath);
+    }
+  }
 };

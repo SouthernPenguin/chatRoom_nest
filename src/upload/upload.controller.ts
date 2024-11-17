@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  UseInterceptors,
-  UploadedFile,
-  BadRequestException,
-  Query,
-} from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, Query, Req } from '@nestjs/common';
 import { UploadService } from './upload.service';
 
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -16,6 +9,7 @@ import { MessageService } from 'src/message/message.service';
 import { ListMessageDto } from 'src/message/dto/list-message.dto';
 import { ChatType } from 'src/enum';
 import { GroupMessageService } from 'src/group-message/group-message.service';
+import { getTokenUser } from 'src/utils';
 
 @Controller('upload')
 @ApiTags('文件上传')
@@ -30,26 +24,17 @@ export class UploadController {
 
   @ApiOperation({ summary: '用户头像上传' })
   @ApiBody({ type: CreateUploadDto, description: '' })
-  @ApiQuery({
-    name: 'id',
-    description: '用户id',
-    required: true,
-    type: Number,
-  })
   @Post('/upLoadUserImage')
   @UseInterceptors(FileInterceptor('file')) // UseInterceptors 处理文件的中间件，file是一个标识名
-  upLoadUserImage(
-    @Query('id') id: number,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    const imgTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
-    if (!imgTypes.includes(file.mimetype)) {
+  async upLoadUserImage(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    const allowedImageTypes = ['gif', 'png', 'jpg', 'jpeg', 'bmp', 'webp', 'svg', 'tiff'];
+
+    if (!file || allowedImageTypes.findIndex(item => file.originalname.split('.')[1] === item) < 0) {
       throw new BadRequestException('请上传图片');
     }
-    if (typeof id == 'undefined') {
-      throw new BadRequestException('用户不存在');
-    }
-    this.uploadService.upLoadUserImageSave(id, file);
+
+    const currentUser = await getTokenUser(req); // 当前用户
+    this.uploadService.upLoadUserImageSave(currentUser?.id, file);
   }
 
   @ApiOperation({ summary: '聊天文件上传' })
@@ -74,12 +59,7 @@ export class UploadController {
     @Query('msgType') msgType: ChatType,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    await this.uploadService.messageFileSave(
-      toUserId,
-      fromUserId,
-      file,
-      msgType,
-    );
+    await this.uploadService.messageFileSave(toUserId, fromUserId, file, msgType);
     if (msgType === ChatType.私聊) {
       // 通知
       const r = await this.messageService.getNewNotice(fromUserId);

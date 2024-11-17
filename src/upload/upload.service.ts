@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import * as moment from 'moment';
 import { ChatType } from 'src/enum';
 import { CreateGroupMessageDto } from 'src/group-message/dto/create-group-message.dto';
 import { GroupMessageService } from 'src/group-message/group-message.service';
@@ -20,20 +21,18 @@ export class UploadService {
 
   async upLoadUserImageSave(id: number, file: Express.Multer.File) {
     const res = await this.userService.findOne(id);
+    // 上传后实际路径
+    const afterUploadingPath = file.path.split('uploadFiles')[1].replace(/\\/g, '/');
     if (res?.id) {
-      res.headerImg = `${configYml.PREFIX}${file.filename}`;
+      res.headerImg = `http://127.0.0.1:${configYml.PORT}${configYml.PREFIX}${afterUploadingPath}`;
       return this.userService.update(id, res);
     }
     return '';
   }
 
-  async messageFileSave(
-    toUserId: number,
-    fromUserId: number,
-    file: Express.Multer.File,
-    msgType: ChatType,
-  ) {
-    const postMessage = `http://127.0.0.1:${configYml.PORT}/${configYml.PREFIX}${file.filename}`;
+  async messageFileSave(toUserId: number, fromUserId: number, file: Express.Multer.File, msgType: ChatType) {
+    const afterUploadingPath = file.path.split('uploadFiles')[1].replace(/\\/g, '/');
+    const postMessage = `http://127.0.0.1:${configYml.PORT}/${configYml.PREFIX}${afterUploadingPath}`;
     if (msgType === ChatType.私聊) {
       const dto = {
         postMessage,

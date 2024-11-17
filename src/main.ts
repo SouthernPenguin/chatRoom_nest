@@ -17,13 +17,9 @@ async function bootstrap() {
   const configYml: any = redConfigFile();
 
   //配置静态文件访问目录
-  app.useStaticAssets(join(__dirname, 'uploadFiles'), {
-    prefix: configYml.PREFIX,
+  app.useStaticAssets(join(__dirname, '../../', 'uploadFiles'), {
+    prefix: configYml.PREFIX, // 可选，设置访问前缀
   });
-  // app.useStaticAssets(join(__dirname, '..', 'public'), {
-  //   // 配置虚拟路径
-  //   prefix: configYml.PREFIX,
-  // });
 
   // swagger配置
   const config = new DocumentBuilder()
