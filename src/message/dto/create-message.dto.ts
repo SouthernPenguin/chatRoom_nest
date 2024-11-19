@@ -1,15 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ChatType, MessageEnum } from 'src/enum';
 
 export class CreateMessageDto {
-  // @IsNotEmpty({ message: '内容不能为空' })
   @IsString()
   @ApiProperty({
     example: '',
@@ -19,24 +12,24 @@ export class CreateMessageDto {
   })
   postMessage: string;
 
-  @IsNotEmpty({ message: '发送者id' })
-  @IsNumber()
-  @ApiProperty({
-    example: '',
-    description: '发送者id',
-    name: 'fromUserId',
-    type: Number,
-  })
+  // @IsNotEmpty({ message: '发送者id' })
+  // @IsNumber()
+  // @ApiProperty({
+  //   example: '',
+  //   description: '发送者id',
+  //   name: 'fromUserId',
+  //   type: Number,
+  // })
   fromUserId: number;
 
-  @IsNotEmpty({ message: '接收者id' })
-  @IsNumber()
   @ApiProperty({
     example: '',
     description: '接收者id',
     name: 'toUserId',
     type: Number,
   })
+  @IsNotEmpty({ message: '接收者id不能为空' })
+  @IsNumber()
   toUserId: number;
 
   // @ApiProperty({
@@ -51,19 +44,21 @@ export class CreateMessageDto {
   @IsOptional()
   fileSize: string;
 
-  @ApiProperty({
-    example: '',
-    enum: MessageEnum,
-    description: '未读:UNREAD/已读:READ/撤回:WITHDRAW/删除:DELETE',
-    name: 'toUserId',
-  })
+  // @IsEnum(MessageEnum)
+  // @ApiProperty({
+  //   example: '',
+  //   enum: MessageEnum,
+  //   description: '未读:UNREAD/已读:READ/撤回:WITHDRAW/删除:DELETE',
+  //   name: 'state',
+  //   type: 'enum',
+  // })
   @IsOptional()
   state: MessageEnum;
 
-  @ApiProperty({
-    example: '',
-    description: '创建时间',
-  })
+  // @ApiProperty({
+  //   example: '',
+  //   description: '创建时间',
+  // })
   @IsOptional()
   createdTime: Date;
 

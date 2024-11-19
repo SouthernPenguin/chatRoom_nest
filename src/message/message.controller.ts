@@ -11,13 +11,7 @@ import {
   Delete,
   Put,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 // import { UpdateMessageDto } from './dto/update-message.dto';
@@ -40,32 +34,21 @@ export class MessageController {
 
   @Post()
   @ApiOperation({
-    summary:
-      '发送信息, 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
+    summary: '发送信息, 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
   })
   @ApiBody({ type: CreateMessageDto, description: '' })
-  async create(
-    @Req() req: Request,
-    @Body() createMessageDto: CreateMessageDto,
-  ) {
+  async create(@Req() req: Request, @Body() createMessageDto: CreateMessageDto) {
     try {
       const currentUser = await getTokenUser(req); // 当前用户
-      const res = await this.messageService.create(
-        createMessageDto,
-        currentUser?.id,
-      );
+      createMessageDto.fromUserId = currentUser?.id;
+      const res = await this.messageService.create(createMessageDto, currentUser?.id);
+
       // 通知
-      const r = await this.messageService.getNewNotice(currentUser?.id);
-      this.ws.server.emit('activeUserNoticeList', r);
+      // const r = await this.messageService.getNewNotice(currentUser?.id);
+      // this.ws.server.emit('activeUserNoticeList', r);
 
       // 聊天记录
-      this.ws.server.emit(
-        'activeTowUsers',
-        await this.findAll({
-          fromUserId: createMessageDto.fromUserId,
-          toUserId: createMessageDto.toUserId,
-        } as ListMessageDto),
-      );
+      this.ws.server.emit('activeTowUsers', res);
 
       return res;
     } catch (error) {
@@ -77,10 +60,7 @@ export class MessageController {
   @ApiOperation({ summary: '批量更新信息状态' })
   @ApiQuery({ type: ListMessageDto, description: '' })
   @UseInterceptors(ListInterceptorsInterceptor)
-  async messageState(
-    @Req() req: Request,
-    @Query() listMessageDto: ListMessageDto,
-  ) {
+  async messageState(@Req() req: Request, @Query() listMessageDto: ListMessageDto) {
     const currentUser = await getTokenUser(req); // 当前用户
     await this.messageService.upAllState(listMessageDto, currentUser?.id);
 
@@ -94,7 +74,10 @@ export class MessageController {
   @UseInterceptors(ListInterceptorsInterceptor)
   async findAll(@Query() listMessageDto: ListMessageDto, @Req() req?: Request) {
     const currentUser = await getTokenUser(req); // 当前用户
-    return await this.messageService.findAll(listMessageDto, currentUser?.id);
+    if (currentUser) {
+      listMessageDto.fromUserId = currentUser?.id;
+    }
+    return await this.messageService.findAll(listMessageDto);
   }
 
   @Post(':id')
@@ -106,23 +89,17 @@ export class MessageController {
     required: true,
     type: Number,
   })
-  async backMsg(
-    @Param('id') id: number,
-    @Body() changeMessageState: ChangeMessageState,
-  ) {
-    const res = await this.messageService.changeMessageState(
-      id,
-      MessageEnum.撤回,
-    );
+  async backMsg(@Param('id') id: number, @Body() changeMessageState: ChangeMessageState, @Req() req?: Request) {
+    const res = await this.messageService.changeMessageState(id, MessageEnum.撤回);
     // 聊天记录
+    const currentUser = await getTokenUser(req); // 当前用户
     this.ws.server.emit(
       'activeTowUsers',
       await this.findAll({
-        fromUserId: changeMessageState.fromUserId,
+        fromUserId: currentUser?.id,
         toUserId: changeMessageState.toUserId,
       } as ListMessageDto),
     );
-
     return res;
   }
 
@@ -136,14 +113,8 @@ export class MessageController {
     type: Number,
   })
   @ApiBody({ type: ChangeMessageState, description: '' })
-  async remove(
-    @Param('id') id: number,
-    @Body() changeMessageState: ChangeMessageState,
-  ) {
-    const res = await this.messageService.changeMessageState(
-      id,
-      MessageEnum.删除,
-    );
+  async remove(@Param('id') id: number, @Body() changeMessageState: ChangeMessageState) {
+    const res = await this.messageService.changeMessageState(id, MessageEnum.删除);
 
     // 聊天记录
     this.ws.server.emit(

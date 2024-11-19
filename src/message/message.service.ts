@@ -21,32 +21,27 @@ export class MessageService {
   ) {}
 
   async create(createMessageDto: CreateMessageDto, currentUser?: number) {
-    const isFriend = await this.friendShipService.isFriend(
-      createMessageDto.toUserId,
-      createMessageDto.fromUserId,
-    );
+    const isFriend = await this.friendShipService.isFriend(createMessageDto.toUserId, createMessageDto.fromUserId);
     if (!isFriend?.id) {
       throw new BadRequestException('不是好友关系无法发送消息');
     }
 
     const resCreate = await this.messageRepository.create(createMessageDto);
-    const res = await this.messageRepository.save(resCreate);
+    return this.messageRepository.save(resCreate);
 
     // 统计未读信息
-    await this.countUnReadNumber(createMessageDto, currentUser);
+    // await this.countUnReadNumber(createMessageDto, currentUser);
 
-    // 发送通知
-    if (res?.id) {
-      await this.notificationService.create({
-        newMessage: res.fileSize
-          ? res.postMessage.split('files/')[1]
-          : res.postMessage,
-        fromUserId: res.fromUserId,
-        toUserId: res.toUserId,
-        msgType: createMessageDto.msgType,
-      });
-      return res;
-    }
+    // // 发送通知
+    // if (res?.id) {
+    //   await this.notificationService.create({
+    //     newMessage: res.fileSize ? res.postMessage.split('files/')[1] : res.postMessage,
+    //     fromUserId: res.fromUserId,
+    //     toUserId: res.toUserId,
+    //     msgType: createMessageDto.msgType,
+    //   });
+    //   return res;
+    // }
   }
 
   // 当前用户消息列表;
@@ -55,20 +50,17 @@ export class MessageService {
   }
 
   // 聊天记录列表;
-  async findAll(listMessageDto: ListMessageDto, currentUser?: number) {
+  async findAll(listMessageDto: ListMessageDto) {
     const { page, limit } = listMessageDto;
     const queryBuilder = this.messageRepository
       .createQueryBuilder('message')
       .where('message.state  <> :state', { state: MessageEnum.撤回 });
 
     if (listMessageDto.createdTime && listMessageDto.createdTime.length) {
-      queryBuilder.andWhere(
-        'DATE_FORMAT(message.createdTime, "%Y-%m-%d") BETWEEN :startDate AND :endDate',
-        {
-          startDate: listMessageDto.createdTime[0],
-          endDate: listMessageDto.createdTime[1],
-        },
-      );
+      queryBuilder.andWhere('DATE_FORMAT(message.createdTime, "%Y-%m-%d") BETWEEN :startDate AND :endDate', {
+        startDate: listMessageDto.createdTime[0],
+        endDate: listMessageDto.createdTime[1],
+      });
     }
 
     queryBuilder
@@ -80,43 +72,31 @@ export class MessageService {
         },
       )
       .addOrderBy('message.createdTime', 'DESC')
-      .leftJoinAndSelect('message.toUser', 'toUser') // 关联的实体属性，别名
-      .leftJoinAndSelect('message.fromUser', 'fromUser');
+      .leftJoinAndSelect('message.toUser', 'toUser'); // 关联的实体属性，别名
+    // .leftJoinAndSelect('message.fromUser', 'fromUser');
 
-    const allRedisList = await this.redisService.getAllActiveUser();
-    const allRedisListParse = allRedisList.map((item: string) =>
-      JSON.parse(item),
-    );
-    if (currentUser) {
-      if (
-        allRedisListParse.filter((item) => item.userId === currentUser).length <
-        1
-      ) {
-        // 双方用户正在聊天 设置缓存
-        this.redisService.setList({
-          msgType: ChatType.私聊,
-          userId: currentUser,
-          toUserId:
-            listMessageDto.fromUserId === currentUser
-              ? listMessageDto.toUserId
-              : listMessageDto.fromUserId,
-        });
-      } else {
-        this.redisService.deleteActiveUserItem(
-          JSON.stringify(
-            allRedisListParse.filter((item) => item.userId === currentUser)[0],
-          ),
-        );
-        this.redisService.setList({
-          msgType: ChatType.私聊,
-          userId: currentUser,
-          toUserId:
-            listMessageDto.fromUserId === currentUser
-              ? listMessageDto.toUserId
-              : listMessageDto.fromUserId,
-        });
-      }
-    }
+    // 设置缓存
+    // const allRedisList = await this.redisService.getAllActiveUser();
+    // const allRedisListParse = allRedisList.map((item: string) => JSON.parse(item));
+    // if (currentUser) {
+    //   if (allRedisListParse.filter(item => item.userId === currentUser).length < 1) {
+    //     // 双方用户正在聊天 设置缓存
+    //     this.redisService.setList({
+    //       msgType: ChatType.私聊,
+    //       userId: currentUser,
+    //       toUserId: listMessageDto.fromUserId === currentUser ? listMessageDto.toUserId : listMessageDto.fromUserId,
+    //     });
+    //   } else {
+    //     this.redisService.deleteActiveUserItem(
+    //       JSON.stringify(allRedisListParse.filter(item => item.userId === currentUser)[0]),
+    //     );
+    //     this.redisService.setList({
+    //       msgType: ChatType.私聊,
+    //       userId: currentUser,
+    //       toUserId: listMessageDto.fromUserId === currentUser ? listMessageDto.toUserId : listMessageDto.fromUserId,
+    //     });
+    //   }
+    // }
 
     const count = await queryBuilder.getCount();
     const content = await queryBuilder
@@ -126,35 +106,25 @@ export class MessageService {
 
     return {
       content,
-      totalElements: Math.ceil(count / limit),
-      totalPages: Number(page || 1),
+      totalElements: count,
+      totalPages: Math.ceil(count / limit),
     } as unknown;
   }
 
   // 更新所有未读状态
-  async upAllState(
-    changeMessageState: ChangeMessageState,
-    currentUser: number,
-  ) {
+  async upAllState(changeMessageState: ChangeMessageState, currentUser: number) {
     try {
       const fromUserId =
-        currentUser == changeMessageState.fromUserId
-          ? changeMessageState.toUserId
-          : changeMessageState.fromUserId;
+        currentUser == changeMessageState.fromUserId ? changeMessageState.toUserId : changeMessageState.fromUserId;
 
       const toUserId =
-        currentUser == changeMessageState.fromUserId
-          ? changeMessageState.fromUserId
-          : changeMessageState.toUserId;
+        currentUser == changeMessageState.fromUserId ? changeMessageState.fromUserId : changeMessageState.toUserId;
 
       const withdraw = await this.messageRepository
         .createQueryBuilder('message')
         .update(Message)
         .set({ state: MessageEnum.已读 })
-        .where(
-          'message.fromUserId = :fromUserId and message.toUserId = :toUserId ',
-          { toUserId, fromUserId },
-        )
+        .where('message.fromUserId = :fromUserId and message.toUserId = :toUserId ', { toUserId, fromUserId })
         .execute();
 
       if (withdraw.affected > 0) {
@@ -207,18 +177,15 @@ export class MessageService {
   }
 
   // 统计双方未读次数
-  async countUnReadNumber(
-    createMessageDto: ChangeMessageState,
-    currentUser: number,
-  ) {
+  async countUnReadNumber(createMessageDto: ChangeMessageState, currentUser: number) {
     try {
       let countUnReadNumberQuery = await this.messageRepository
         .createQueryBuilder('message')
         .select('message.fromUserId as userId, COUNT(*) AS msgNumber')
         .where(
           `
-          ((message.fromUserId = :fromUserId and message.toUserId = :toUserId ) or (message.fromUserId = :toUserId and message.toUserId = :fromUserId )) 
-          and 
+          ((message.fromUserId = :fromUserId and message.toUserId = :toUserId ) or (message.fromUserId = :toUserId and message.toUserId = :fromUserId ))
+          and
           message.state = :state
         `,
           {
@@ -253,26 +220,20 @@ export class MessageService {
       }
 
       // 获取所有缓存
-      const redisList = (await this.redisService.getAllActiveUser()).map(
-        (item) => JSON.parse(item),
-      ) as {
+      const redisList = (await this.redisService.getAllActiveUser()).map(item => JSON.parse(item)) as {
         msgType: ChatType;
         userId: number;
         toUserId: number;
       }[];
 
       // 过滤出当前发送用户的缓存
-      const filterList = redisList.filter(
-        (item) => item.userId === currentUser,
-      );
+      const filterList = redisList.filter(item => item.userId === currentUser);
 
       // 通过当前用户缓存，再去找对方是否和自己正在聊天
-      const areBothPartiesChatting = redisList.filter(
-        (item) => item.toUserId === filterList[0].userId,
-      );
+      const areBothPartiesChatting = redisList.filter(item => item.toUserId === filterList[0].userId);
 
       if (areBothPartiesChatting.length) {
-        countUnReadNumberQuery.forEach((item) => {
+        countUnReadNumberQuery.forEach(item => {
           item.msgNumber = 0;
         });
       }
