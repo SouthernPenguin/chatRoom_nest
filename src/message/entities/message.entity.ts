@@ -1,13 +1,6 @@
 import { MessageEnum } from 'src/enum';
 import { User } from 'src/user/entities/user.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 // 消息
 @Entity()
@@ -43,7 +36,7 @@ export class Message {
   })
   fromUserId: number;
   // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, user => user.id, { eager: true })
   @JoinColumn({ name: 'fromUserId' })
   fromUser: User;
 
@@ -55,7 +48,7 @@ export class Message {
   })
   toUserId: number;
   // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, user => user.id, { eager: true })
   @JoinColumn({ name: 'toUserId' })
   toUser: User;
 

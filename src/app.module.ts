@@ -1,9 +1,4 @@
-import {
-  ClassSerializerInterceptor,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-} from '@nestjs/common';
+import { ClassSerializerInterceptor, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -47,7 +42,7 @@ import { SystemUserModule } from './ststem-user/ststem-user.module';
               format: 'YYYY-MM-DD HH:mm:ss',
             }),
             format.printf(
-              (info) =>
+              info =>
                 `${info.timestamp} [${info.level}] : ${info.message} ${
                   Object.keys(info).length ? JSON.stringify(info, null, 2) : ''
                 }`,
