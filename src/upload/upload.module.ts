@@ -47,7 +47,7 @@ import * as moment from 'moment';
         },
         filename: (_, file, callback) => {
           // 使用随机 uuid 生成文件名
-          const filename = `${uuidv4()}.${file.originalname.split('.')[1]}`;
+          const filename = `${uuidv4()}.${file.originalname.split('.')[file.originalname.split('.').length - 1]}`;
           return callback(null, filename);
         },
       }),
