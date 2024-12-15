@@ -89,17 +89,9 @@ export class MessageController {
     required: true,
     type: Number,
   })
-  async backMsg(@Param('id') id: number, @Body() changeMessageState: ChangeMessageState, @Req() req?: Request) {
+  async backMsg(@Param('id') id: number) {
     const res = await this.messageService.changeMessageState(id, MessageEnum.撤回);
-    // 聊天记录
-    const currentUser = await getTokenUser(req); // 当前用户
-    this.ws.server.emit(
-      'activeTowUsers',
-      await this.findAll({
-        fromUserId: currentUser?.id,
-        toUserId: changeMessageState.toUserId,
-      } as ListMessageDto),
-    );
+    this.ws.server.emit('activeTowUsers', res);
     return res;
   }
 

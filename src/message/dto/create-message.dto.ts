@@ -44,6 +44,9 @@ export class CreateMessageDto {
   @IsOptional()
   fileSize: string;
 
+  @IsOptional()
+  originalFileName: string;
+
   // @IsEnum(MessageEnum)
   // @ApiProperty({
   //   example: '',

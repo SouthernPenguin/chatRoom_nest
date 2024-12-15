@@ -8,6 +8,9 @@ export class Message {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ comment: '原始文件名称', type: 'text', nullable: true })
+  originalFileName: string;
+
   @Column({ comment: '文件类型', type: 'text', nullable: true })
   fileType: string;
 

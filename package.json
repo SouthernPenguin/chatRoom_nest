@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
-    "start:debug": "cross-env NODE_ENV=development  nest start --debug --watch",
+    "start:debug": "nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "build": "cross-env NODE_ENV=production nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -19,7 +19,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "commit": "git cz & git push",
-    "prepare": "npx husky install"
+    "prepare": "npx husky install",
+    "typeorm:create": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config ./ormconfig.ts migration:create -n",
+    "typeorm:gen": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config ./ormconfig.ts migration:generate -n",
+    "typeorm:run": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run --config ./ormconfig.ts"
   },
   "config": {
     "commitizen": {
@@ -48,6 +51,7 @@
     "ioredis": "^5.4.1",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
+    "moment": "^2.30.1",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.6.1",
     "nest-winston": "^1.9.4",
@@ -57,6 +61,7 @@
     "res": "^0.4.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17",
+    "uuid": "^11.0.3",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1"
   },

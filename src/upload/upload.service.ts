@@ -41,6 +41,7 @@ export class UploadService {
         fileType: file.filename.split('.')[file.filename.split('.').length - 1],
         fileSize: formatFileSize(file.size),
         msgType: ChatType.私聊,
+        originalFileName: Buffer.from(file.originalname, 'latin1').toString('utf8'),
       } as CreateMessageDto;
 
       return await this.messageService.create(dto);
