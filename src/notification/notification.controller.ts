@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  UseFilters,
-  Param,
-  Patch,
-  Query,
-  Req,
-  Post,
-  Body,
-} from '@nestjs/common';
+import { Controller, Get, UseFilters, Param, Patch, Query, Req, Post, Body } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -29,20 +19,14 @@ export class NotificationController {
 
   @Post()
   @ApiOperation({
-    summary:
-      '想聊天 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
+    summary: '想聊天 前端socket对应名称：activeUserNoticeList(当前用户消息列表)，activeTowUsers(双方聊天记录)',
   })
   async wantMessage(@Req() req: Request, @Body() createMessageDto: CreateDto) {
     await this.notificationService.create({
       newMessage: createMessageDto.newMessage,
       fromUserId: createMessageDto.fromUserId,
-      toUserId: (createMessageDto.msgType === ChatType.群聊
-        ? null
-        : createMessageDto.toUserId) as any,
-      groupId:
-        createMessageDto.msgType === ChatType.群聊
-          ? createMessageDto.toUserId
-          : null,
+      toUserId: (createMessageDto.msgType === ChatType.群聊 ? null : createMessageDto.toUserId) as any,
+      groupId: createMessageDto.msgType === ChatType.群聊 ? createMessageDto.toUserId : null,
       msgType: createMessageDto.msgType,
     });
     const currentUser = await getTokenUser(req); // 当前用户
@@ -54,7 +38,10 @@ export class NotificationController {
   @ApiOperation({ summary: '当前用户消息列表' })
   async findOne(@Req() req: Request) {
     const currentUser = await getTokenUser(req); // 当前用户
-    return this.notificationService.findOne(currentUser.id);
+    const content = await this.notificationService.findOne(currentUser.id);
+    return {
+      content,
+    };
   }
 
   @Patch(':id')
@@ -70,10 +57,7 @@ export class NotificationController {
     enum: MessageEnum,
     description: '已读 = READ;删除 = DELETE',
   })
-  async changeState(
-    @Param('id') id: number,
-    @Query('state') state: MessageEnum,
-  ) {
+  async changeState(@Param('id') id: number, @Query('state') state: MessageEnum) {
     return await this.notificationService.upDateState(id, state);
   }
 }

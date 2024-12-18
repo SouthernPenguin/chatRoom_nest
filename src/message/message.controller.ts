@@ -44,8 +44,8 @@ export class MessageController {
       const res = await this.messageService.create(createMessageDto, currentUser?.id);
 
       // 通知
-      // const r = await this.messageService.getNewNotice(currentUser?.id);
-      // this.ws.server.emit('activeUserNoticeList', r);
+      const r = await this.messageService.getNewNotice(currentUser?.id);
+      this.ws.server.emit('activeUserNoticeList', r);
 
       // 聊天记录
       this.ws.server.emit('activeTowUsers', res);

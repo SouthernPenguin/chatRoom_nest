@@ -26,22 +26,22 @@ export class MessageService {
       throw new BadRequestException('不是好友关系无法发送消息');
     }
 
-    const resCreate = await this.messageRepository.create(createMessageDto);
-    return this.messageRepository.save(resCreate);
+    const resCreate = this.messageRepository.create(createMessageDto);
+    const res = await this.messageRepository.save(resCreate);
 
     // 统计未读信息
     // await this.countUnReadNumber(createMessageDto, currentUser);
 
-    // // 发送通知
-    // if (res?.id) {
-    //   await this.notificationService.create({
-    //     newMessage: res.fileSize ? res.postMessage.split('files/')[1] : res.postMessage,
-    //     fromUserId: res.fromUserId,
-    //     toUserId: res.toUserId,
-    //     msgType: createMessageDto.msgType,
-    //   });
-    //   return res;
-    // }
+    // 创建通知
+    if (res?.id) {
+      await this.notificationService.create({
+        newMessage: res.fileSize ? res.postMessage.split('files/')[1] : res.postMessage,
+        fromUserId: res.fromUserId,
+        toUserId: res.toUserId,
+        msgType: createMessageDto.msgType,
+      });
+      return res;
+    }
   }
 
   // 当前用户消息列表;
