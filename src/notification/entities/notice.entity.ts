@@ -1,15 +1,7 @@
 import { ChatType, MessageEnum } from 'src/enum';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import { User } from 'src/user/entities/user.entity';
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 // 通知表
 @Entity()
@@ -67,7 +59,7 @@ export class Notice {
   })
   fromUserId: number;
   // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, user => user.id, { eager: true })
   @JoinColumn({ name: 'fromUserId' })
   fromUser: User;
 
@@ -79,7 +71,7 @@ export class Notice {
   })
   toUserId: number;
   // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, user => user.id, { eager: true })
   @JoinColumn({ name: 'toUserId' })
   toUser: User;
 
@@ -91,7 +83,7 @@ export class Notice {
   })
   groupId: number;
   // 外键
-  @ManyToOne(() => GroupChat, (groupChat) => groupChat.id, { eager: true })
+  @ManyToOne(() => GroupChat, groupChat => groupChat.id, { eager: true })
   @JoinColumn({ name: 'groupId' })
   toUsers: GroupChat;
 }
