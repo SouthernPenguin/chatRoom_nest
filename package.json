@@ -19,6 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "commit": "git cz & git push",
+    "mac-commit": "git cz",
     "prepare": "npx husky install",
     "typeorm:create": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config ./ormconfig.ts migration:create -n",
     "typeorm:gen": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config ./ormconfig.ts migration:generate -n",
