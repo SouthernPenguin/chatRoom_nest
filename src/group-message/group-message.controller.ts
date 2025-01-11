@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Req,
-  UseFilters,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Req, UseFilters, Query } from '@nestjs/common';
 import { GroupMessageService } from './group-message.service';
 import { CreateGroupMessageDto } from './dto/create-group-message.dto';
 import { getTokenUser } from 'src/utils';
@@ -20,6 +10,7 @@ import { ListGroupMessageDto } from './dto/list-group-message.dto';
 import { WsGateway } from 'src/ws/ws.gateway';
 import { BackMessageDto } from './dto/back-message.dto';
 import { EnterExitTime } from 'src/group-chat/dto/enter-exit-time.dto';
+import { UserService } from 'src/user/user.service';
 
 @Controller('group-message')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
@@ -27,16 +18,14 @@ import { EnterExitTime } from 'src/group-chat/dto/enter-exit-time.dto';
 export class GroupMessageController {
   constructor(
     private readonly groupMessageService: GroupMessageService,
+    private readonly userService: UserService,
     private readonly ws: WsGateway,
   ) {}
 
   @Post()
   @ApiOperation({ summary: '发送信息' })
   @ApiBody({ type: CreateGroupMessageDto, description: '' })
-  async create(
-    @Req() req: Request,
-    @Body() createGroupMessageDto: CreateGroupMessageDto,
-  ) {
+  async create(@Req() req: Request, @Body() createGroupMessageDto: CreateGroupMessageDto) {
     const currentUser = await getTokenUser(req); // 当前用户
     createGroupMessageDto.fromUserId = currentUser?.id;
     const res = await this.groupMessageService.create(createGroupMessageDto);
@@ -46,18 +35,10 @@ export class GroupMessageController {
     this.ws.server.emit('activeUserNoticeList', r);
 
     // 聊天记录
-    this.ws.server.emit(
-      'activeTowUsers',
-      await this.findOne(
-        createGroupMessageDto.groupId,
-        {
-          page: 1,
-          limit: 10,
-          createdTime: [],
-        },
-        req,
-      ),
-    );
+    this.ws.server.emit('activeTowUsers', {
+      ...res,
+      fromUser: await this.userService.findOne(res.fromUserId),
+    });
 
     return res;
   }
@@ -71,16 +52,8 @@ export class GroupMessageController {
     @Req() req?: Request,
   ) {
     const currentUser = await getTokenUser(req); // 当前用户
-    this.groupMessageService.updateGroupUserMsgNumber(
-      Number(id),
-      0,
-      currentUser.id,
-    );
-    return this.groupMessageService.findAll(
-      id,
-      listGroupMessage,
-      currentUser?.id,
-    );
+    this.groupMessageService.updateGroupUserMsgNumber(Number(id), 0, currentUser.id);
+    return this.groupMessageService.findAll(id, listGroupMessage, currentUser?.id);
   }
 
   @Post('/backMsg')
@@ -88,20 +61,9 @@ export class GroupMessageController {
   @ApiBody({ type: BackMessageDto, description: '' })
   async update(@Req() req: Request, @Body() backMessageDto: BackMessageDto) {
     const currentUser = await getTokenUser(req); // 当前用户
-    const res = await this.groupMessageService.update(
-      currentUser?.id,
-      backMessageDto.id,
-      MessageEnum.撤回,
-    );
+    const res = await this.groupMessageService.update(currentUser?.id, backMessageDto.id, MessageEnum.撤回);
     // 聊天记录
-    this.ws.server.emit(
-      'activeTowUsers',
-      await this.findOne(backMessageDto.groupId, {
-        page: 1,
-        limit: 10,
-        createdTime: [],
-      }),
-    );
+    this.ws.server.emit('activeTowUsers', res);
 
     return res;
   }
@@ -109,15 +71,9 @@ export class GroupMessageController {
   @Post('/recordEnterExitTime')
   @ApiOperation({ summary: '记录进入群和离开群时间' })
   @ApiBody({ type: EnterExitTime, description: '' })
-  async upEnterExitTime(
-    @Req() req: Request,
-    @Body() enterExitTime: EnterExitTime,
-  ) {
+  async upEnterExitTime(@Req() req: Request, @Body() enterExitTime: EnterExitTime) {
     const currentUser = await getTokenUser(req); // 当前用户
-    this.groupMessageService.upDateEnterExitTime(
-      currentUser?.id,
-      enterExitTime,
-    );
+    this.groupMessageService.upDateEnterExitTime(currentUser?.id, enterExitTime);
   }
 
   @Delete(':id')
@@ -125,10 +81,6 @@ export class GroupMessageController {
   @ApiParam({ name: 'id' })
   async remove(@Req() req: Request, @Param('id') id: number) {
     const currentUser = await getTokenUser(req); // 当前用户
-    return this.groupMessageService.update(
-      currentUser?.id,
-      id,
-      MessageEnum.删除,
-    );
+    return this.groupMessageService.update(currentUser?.id, id, MessageEnum.删除);
   }
 }
