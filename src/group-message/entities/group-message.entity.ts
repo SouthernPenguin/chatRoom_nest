@@ -1,14 +1,7 @@
 import { MessageEnum } from 'src/enum';
 import { GroupChat } from 'src/group-chat/entities/group-chat.entity';
 import { User } from 'src/user/entities/user.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class GroupMessage {
@@ -22,6 +15,9 @@ export class GroupMessage {
     default: MessageEnum.未读,
   })
   state: MessageEnum;
+
+  @Column({ comment: '原始文件名称', type: 'text', nullable: true })
+  originalFileName: string;
 
   @Column({ comment: '文件类型', type: 'text', nullable: true })
   fileType: string;
@@ -40,7 +36,7 @@ export class GroupMessage {
   })
   groupId: number;
   // 外键
-  @ManyToOne(() => GroupChat, (groupChat) => groupChat.id, { eager: true })
+  @ManyToOne(() => GroupChat, groupChat => groupChat.id, { eager: true })
   @JoinColumn({ name: 'groupId' })
   toUsers: GroupChat;
 
@@ -52,7 +48,7 @@ export class GroupMessage {
   })
   fromUserId: number;
   // 外键
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, user => user.id, { eager: true })
   @JoinColumn({ name: 'fromUserId' })
   fromUser: User;
 

@@ -68,20 +68,13 @@ export class UploadController {
       this.ws.server.emit('activeTowUsers', res);
     }
 
-    // if (msgType === ChatType.群聊) {
-    //   // 通知
-    //   const r = await this.groupMessageService.getNewNotice(toUserId);
-    //   this.ws.server.emit('activeUserNoticeList', r);
+    if (msgType === ChatType.群聊) {
+      // 通知
+      // const r = await this.groupMessageService.getNewNotice(toUserId);
+      // this.ws.server.emit('activeUserNoticeList', r);
 
-    //   // 聊天记录
-    //   this.ws.server.emit(
-    //     'activeTowUsers',
-    //     await this.groupMessageService.findAll(toUserId, {
-    //       page: 1,
-    //       limit: 10,
-    //       createdTime: [],
-    //     }),
-    //   );
-    // }
+      // 聊天记录
+      this.ws.server.emit('activeTowUsers', res);
+    }
   }
 }

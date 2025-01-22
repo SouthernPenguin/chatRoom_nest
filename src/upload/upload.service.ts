@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import * as moment from 'moment';
 import { ChatType } from 'src/enum';
 import { CreateGroupMessageDto } from 'src/group-message/dto/create-group-message.dto';
 import { GroupMessageService } from 'src/group-message/group-message.service';
@@ -47,16 +46,20 @@ export class UploadService {
       return await this.messageService.create(dto);
     }
 
-    // if (msgType === ChatType.群聊) {
-    //   const dto = {
-    //     groupId: toUserId,
-    //     fromUserId,
-    //     postMessage,
-    //     fileType: file.filename.split('.')[file.filename.split('.').length - 1],
-    //     fileSize: formatFileSize(file.size),
-    //     msgType: ChatType.群聊,
-    //   } as CreateGroupMessageDto;
-    //   return await this.groupMessageService.create(dto);
-    // }
+    if (msgType === ChatType.群聊) {
+      const dto = {
+        groupId: toUserId,
+        fromUserId,
+        postMessage,
+        fileType: file.filename.split('.')[file.filename.split('.').length - 1],
+        fileSize: formatFileSize(file.size),
+        msgType: ChatType.群聊,
+        originalFileName: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+      } as CreateGroupMessageDto;
+      const userInform = await this.userService.findOne(dto.fromUserId);
+      dto['fromUser'] = userInform;
+
+      return await this.groupMessageService.create(dto);
+    }
   }
 }
