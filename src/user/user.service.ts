@@ -98,4 +98,8 @@ export class UserService {
       totalPages: Math.ceil(count / limit),
     };
   }
+
+  batchUser(ids: number[]) {
+    return this.userRepository.createQueryBuilder().where('id IN (:...ids)', { ids }).getMany();
+  }
 }

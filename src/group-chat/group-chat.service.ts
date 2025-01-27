@@ -26,56 +26,45 @@ export class GroupChatService {
     return this.groupChatRepository.save(res);
   }
 
+  // 用户群列表
   async findAll(userId: number) {
     return {
-      content: await this.groupChatRepository
-        .createQueryBuilder('group_chat')
-        .select(['group_chat.id', 'group_chat.name', 'group_chat.notice'])
-        .leftJoinAndSelect('group_chat.users', 'users')
-        // .leftJoinAndSelect('group_chat.createdUserId', 'createdUser')
-        .where('group_chat.createdUserId = :userId', {
-          userId,
-        })
-        .orWhere('users.id = :userId', { userId })
-        .getMany(),
+      content: await this.groupChatUserRepository.userGroupList(userId),
     };
   }
 
   async findOne(id: number) {
-    const groupChatRes = await this.groupChatRepository
-      .createQueryBuilder('group_chat')
-      .leftJoinAndSelect('group_chat.createdUserId', 'createdUser')
-      .where('group_chat.id = :id', {
-        id,
-      })
-      .getOne();
-
-    const res = await this.groupChatUserRepository.findOne(id);
-
-    const selectUser = await this.userAuthService.selectAllUser(res.map(item => item.userId));
-
-    res.map(item => {
-      item['userInform'] = selectUser.filter(user => user.id == item.userId)[0];
-      item['GroupLeader'] = item.userId == groupChatRes.createdUserId.id;
-    });
-    return res;
+    // const groupChatRes = await this.groupChatRepository
+    //   .createQueryBuilder('group_chat')
+    //   .leftJoinAndSelect('group_chat.createdUserId', 'createdUser')
+    //   .where('group_chat.id = :id', {
+    //     id,
+    //   })
+    //   .getOne();
+    // const res = await this.groupChatUserRepository.findOne(id);
+    // const selectUser = await this.userAuthService.selectAllUser(res.map(item => item.userId));
+    // res.map(item => {
+    //   item['userInform'] = selectUser.filter(user => user.id == item.userId)[0];
+    //   item['GroupLeader'] = item.userId == groupChatRes.createdUserId.id;
+    // });
+    // return res;
   }
 
   async update(id: number, updateGroupChatDto: UpdateGroupChatDto) {
-    const res = await this.groupChatRepository.findOne({
-      where: {
-        id,
-      },
-    });
-    if (!res?.id) {
-      throw new BadRequestException('只有群主有权限修改群名与公告');
-    }
-    return await this.groupChatRepository
-      .createQueryBuilder('message')
-      .update(GroupChat)
-      .set({ name: updateGroupChatDto.name, notice: updateGroupChatDto.notice })
-      .where('id = :id', { id })
-      .execute();
+    // const res = await this.groupChatRepository.findOne({
+    //   where: {
+    //     id,
+    //   },
+    // });
+    // if (!res?.id) {
+    //   throw new BadRequestException('只有群主有权限修改群名与公告');
+    // }
+    // return await this.groupChatRepository
+    //   .createQueryBuilder('message')
+    //   .update(GroupChat)
+    //   .set({ name: updateGroupChatDto.name, notice: updateGroupChatDto.notice })
+    //   .where('id = :id', { id })
+    //   .execute();
   }
 
   remove(id: number) {

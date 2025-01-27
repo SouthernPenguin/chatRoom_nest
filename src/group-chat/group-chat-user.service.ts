@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EnterExitTime } from './dto/enter-exit-time.dto';
 import { GroupChat } from './entities/group-chat.entity';
+import { UserService } from './../user/user.service';
 
 @Injectable()
 export class GroupChatUserService {
@@ -13,11 +14,32 @@ export class GroupChatUserService {
 
     @InjectRepository(GroupChat)
     private groupChatRepository: Repository<GroupChat>,
+
+    private userService: UserService,
   ) {}
 
   // 详情
   async findOne(groupChatId: number) {
-    return this.groupChatUserRepository.createQueryBuilder('group_chat_user').where({ groupChatId }).getMany();
+    const userIds = (await this.groupChatUserRepository.find({ where: { groupChatId: groupChatId } })).map(
+      item => item.userId,
+    );
+    return {
+      content: await this.userService.batchUser(userIds),
+    };
+  }
+
+  // 用户群列表
+  async userGroupList(userId: number) {
+    return await this.groupChatRepository.query(
+      `SELECT
+        group_chat.*
+        FROM
+          group_chat_user
+          INNER  JOIN group_chat ON group_chat_user.groupChatId = group_chat.id
+          AND group_chat_user.userId = ${userId}
+        GROUP BY
+          group_chat.id`,
+    );
   }
 
   // 更新信息数量

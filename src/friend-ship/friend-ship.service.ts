@@ -131,14 +131,14 @@ export class FriendShipService {
           }
         }
 
-        if (item.msgType === ChatType.群聊) {
-          const res = await this.groupChatUserService.findOne(item.toUsers.id);
-          if (res.length) {
-            const msgNumber = res.filter(i => i.msgNumber > 0 && i.userId === currentUserId) as GroupChatUser[];
+        // if (item.msgType === ChatType.群聊) {
+        //   const res = await this.groupChatUserService.findOne(item.toUsers.id);
+        //   if (res.length) {
+        //     const msgNumber = res.filter(i => i.msgNumber > 0 && i.userId === currentUserId) as GroupChatUser[];
 
-            item.friendMsgNumber = msgNumber.length ? msgNumber[0].msgNumber : 0;
-          }
-        }
+        //     item.friendMsgNumber = msgNumber.length ? msgNumber[0].msgNumber : 0;
+        //   }
+        // }
       }
     }
     return notices;

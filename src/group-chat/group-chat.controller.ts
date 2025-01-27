@@ -8,12 +8,16 @@ import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { CreatedGroupChatPipe } from './pipe/created-group-chat/created-group-chat.pipe';
+import { GroupChatUserService } from './group-chat-user.service';
 
 @Controller('group-chat')
 @UseFilters(HttpExceptionFilter, TypeormFilter)
 @ApiTags('创建群聊')
 export class GroupChatController {
-  constructor(private readonly groupChatService: GroupChatService) {}
+  constructor(
+    private readonly groupChatService: GroupChatService,
+    private readonly groupChatUser: GroupChatUserService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: '创建群' })
@@ -34,7 +38,7 @@ export class GroupChatController {
   @ApiParam({ name: 'id', required: true, description: '群id' })
   @ApiOperation({ summary: '群人员' })
   findOne(@Param('id') id: number) {
-    return this.groupChatService.findOne(id);
+    return this.groupChatUser.findOne(id);
   }
 
   @Patch(':id')
