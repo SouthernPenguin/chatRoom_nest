@@ -24,6 +24,7 @@ import { RedisModule } from './redis/redis.module';
 import { MenuModule } from './menu/menu.module';
 import { RoleModule } from './role/role.module';
 import { SystemUserModule } from './ststem-user/ststem-user.module';
+import { SummaryMessageModule } from './summary-message/summary-message.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { SystemUserModule } from './ststem-user/ststem-user.module';
     MenuModule,
     RoleModule,
     SystemUserModule,
+    SummaryMessageModule,
   ],
   controllers: [],
   providers: [

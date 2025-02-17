@@ -114,4 +114,12 @@ export class GroupChatUserService {
       throw new ServiceUnavailableException(error.message);
     }
   }
+
+  // 当前用户加入的群数量
+  async findUserGroupChatNumber(userId: number) {
+    const res = await this.groupChatUserRepository.query(
+      `  SELECT COUNT(group_chat_user.groupChatId) as number FROM group_chat_user WHERE userId = ${userId}  GROUP BY group_chat_user.groupChatId`,
+    );
+    return res.length;
+  }
 }

@@ -8,7 +8,6 @@ import { ChatType, FriendShipEnum } from 'src/enum';
 import { UserService } from 'src/user/user.service';
 import { Notice } from 'src/notification/entities/notice.entity';
 import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
-import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 import { GetFriendDto } from './dto/select-friend-ship';
 
 @Injectable()
@@ -206,5 +205,14 @@ export class FriendShipService {
         })
         .getOne();
     }
+  }
+
+  // 统计当前好友数量
+  async findAllFriendByUserId(userId: number) {
+    const res = await this.friendShipRepository
+      .createQueryBuilder('friendShip')
+      .where('friendShip.sortedKey LIKE :key', { key: `%${userId}%` })
+      .getMany();
+    return res.length;
   }
 }

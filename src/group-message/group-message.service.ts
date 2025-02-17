@@ -61,15 +61,15 @@ export class GroupMessageService {
 
     // await this.groupChatUserService.updateUsersStatusComplex(createGroupMessageDto.groupId, r);
 
-    // if (returnRes?.id) {
-    //   await this.notificationService.create({
-    //     newMessage: res.fileSize ? res.postMessage.split('files/')[1] : res.postMessage,
-    //     fromUserId: res.fromUserId,
-    //     toUserId: null,
-    //     groupId: createGroupMessageDto.groupId,
-    //     msgType: createGroupMessageDto.msgType,
-    //   });
-    // }
+    if (returnRes?.id) {
+      await this.notificationService.create({
+        newMessage: res.fileSize ? res.postMessage.split('files/')[1] : res.postMessage,
+        fromUserId: res.fromUserId,
+        toUserId: null,
+        groupId: createGroupMessageDto.groupId,
+        msgType: createGroupMessageDto.msgType,
+      });
+    }
     return returnRes;
   }
 
