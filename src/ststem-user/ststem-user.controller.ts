@@ -9,27 +9,13 @@ import {
   UseInterceptors,
   Query,
   UseGuards,
-  Req,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import {
-  GetSystemUserDto,
-  ReturnSystemUserDto,
-} from './dto/get-system-user.dto';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetSystemUserDto, ReturnSystemUserDto } from './dto/get-system-user.dto';
 import { JwtGuard } from 'src/global/guard/jwt.guards';
 import { SystemUserService } from './ststem-user.service';
 import { CreateSystemUserDto } from './dto/create-ststem-user.dto';
-import {
-  ChangeSystemUserPasswordDto,
-  UpdateSystemUserDto,
-} from './dto/update-ststem-user.dto';
+import { ChangeSystemUserPasswordDto, UpdateSystemUserDto } from './dto/update-ststem-user.dto';
 
 @Controller('system-user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -47,14 +33,8 @@ export class SystemUserController {
     description: '成功返回200，失败返回400',
     type: ChangeSystemUserPasswordDto,
   })
-  async upPassword(
-    @Body() changeSystemUserPasswordDto: ChangeSystemUserPasswordDto,
-    @Param('id') id: number,
-  ) {
-    return this.systemUserService.updatePassword(
-      id,
-      changeSystemUserPasswordDto,
-    );
+  async upPassword(@Body() changeSystemUserPasswordDto: ChangeSystemUserPasswordDto, @Param('id') id: number) {
+    return this.systemUserService.updatePassword(id, changeSystemUserPasswordDto);
   }
 
   @Post()
@@ -102,10 +82,7 @@ export class SystemUserController {
     description: '成功返回200，失败返回400',
     type: CreateSystemUserDto,
   })
-  async update(
-    @Body() updateSystemUserDto: UpdateSystemUserDto,
-    @Param('id') id: number,
-  ) {
+  async update(@Body() updateSystemUserDto: UpdateSystemUserDto, @Param('id') id: number) {
     return this.systemUserService.update(id, updateSystemUserDto);
   }
 }
