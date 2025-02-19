@@ -20,6 +20,9 @@ export class AuthService {
     if (!res) {
       throw new BadRequestException('账号密码错误');
     }
+    if (res.isBlack) {
+      throw new BadRequestException('账号已被拉黑,请联系管理！！');
+    }
     const payload = { username: res.name, id: res.id };
     return {
       userInfo: res,
