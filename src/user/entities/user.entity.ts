@@ -16,6 +16,9 @@ export class User {
   })
   name: string;
 
+  @Column({ type: 'boolean', comment: '拉黑', nullable: true, default: 0 })
+  isBlack: boolean;
+
   @Column({ type: 'varchar', comment: '昵称', nullable: true })
   nickname: string;
 
@@ -29,7 +32,7 @@ export class User {
   @Column({ type: 'int', comment: '性别', nullable: true })
   gender: number;
 
-  @ManyToMany(() => GroupChat, (groupChat) => groupChat.users)
+  @ManyToMany(() => GroupChat, groupChat => groupChat.users)
   groupChats: GroupChat[];
 
   // @OneToMany(() => GroupChatUser, (userBusinessLine) => userBusinessLine.user)

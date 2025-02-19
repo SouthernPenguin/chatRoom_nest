@@ -1,23 +1,7 @@
-import {
-  Controller,
-  Get,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseFilters,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseFilters, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { UpUserPassWord } from './dto/update.userPassWord';
@@ -73,6 +57,30 @@ export class UserController {
     return this.userService.remove(id);
   }
 
+  @Get('resetPassword/:id')
+  @ApiParam({
+    name: 'id',
+    description: '用户id',
+    required: true,
+    type: String,
+  })
+  @ApiOperation({ summary: '用户密码重置' })
+  reset(@Param('id') id: number) {
+    return this.userService.resetPassword(id);
+  }
+
+  @Get('black/:id')
+  @ApiParam({
+    name: 'id',
+    description: '用户id',
+    required: true,
+    type: String,
+  })
+  @ApiOperation({ summary: '用户拉黑' })
+  black(@Param('id') id: number) {
+    return this.userService.blackUser(id);
+  }
+
   @Post('changePassword/:id')
   @ApiOperation({ summary: '修改密码' })
   @ApiBody({ type: UpUserPassWord, description: '' })
@@ -82,10 +90,7 @@ export class UserController {
     required: true,
     type: Number,
   })
-  upPassword(
-    @Param('id') id: number,
-    @Body() updatePassWordDto: UpUserPassWord,
-  ) {
+  upPassword(@Param('id') id: number, @Body() updatePassWordDto: UpUserPassWord) {
     return this.userService.updatePassword(id, updatePassWordDto);
   }
 }

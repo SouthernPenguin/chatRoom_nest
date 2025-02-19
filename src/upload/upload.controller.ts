@@ -1,4 +1,4 @@
-import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, Query, Req } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, Query, Req, Body } from '@nestjs/common';
 import { UploadService } from './upload.service';
 
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,7 +6,6 @@ import { ApiOperation, ApiTags, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { CreateUploadDto } from './dto/create-upload.dto';
 import { WsGateway } from 'src/ws/ws.gateway';
 import { MessageService } from 'src/message/message.service';
-import { ListMessageDto } from 'src/message/dto/list-message.dto';
 import { ChatType } from 'src/enum';
 import { GroupMessageService } from 'src/group-message/group-message.service';
 import { getTokenUser } from 'src/utils';
@@ -38,6 +37,31 @@ export class UploadController {
 
     const currentUser = await getTokenUser(req); // 当前用户
     this.uploadService.upLoadUserImageSave(currentUser?.id, file);
+  }
+
+  @ApiOperation({ summary: '系统用户操作用户头像上传' })
+  @ApiBody({ type: CreateUploadDto, description: '' })
+  @ApiQuery({
+    name: 'userId',
+    description: '用户id',
+    required: true,
+    type: Number,
+  })
+  @Post('/sysytenUserUpLoadUserImage')
+  @UseInterceptors(FileInterceptor('file')) // UseInterceptors 处理文件的中间件，file是一个标识名
+  async systemUserUpLoadUserImage(@UploadedFile() file: Express.Multer.File, @Query('userId') userId: number) {
+    const allowedImageTypes = ['gif', 'png', 'jpg', 'jpeg', 'bmp', 'webp', 'svg', 'tiff'];
+
+    if (
+      !file ||
+      allowedImageTypes.findIndex(item => file.filename.split('.')[file.filename.split('.').length - 1] === item) < 0
+    ) {
+      throw new BadRequestException('请上传图片');
+    }
+    const res = await this.uploadService.upLoadUserImageSave(userId, file);
+    if (!userId) {
+      return res;
+    }
   }
 
   @ApiOperation({ summary: '聊天文件上传' })

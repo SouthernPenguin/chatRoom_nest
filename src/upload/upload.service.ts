@@ -19,14 +19,18 @@ export class UploadService {
   ) {}
 
   async upLoadUserImageSave(id: number, file: Express.Multer.File) {
-    const res = await this.userService.findOne(id);
     // 上传后实际路径
     const afterUploadingPath = file.path.split('uploadFiles')[1].replace(/\\/g, '/');
-    if (res?.id) {
-      res.headerImg = `http://127.0.0.1:${configYml.PORT}${configYml.PREFIX}${afterUploadingPath}`;
-      return this.userService.update(id, res);
+    if (id) {
+      const res = await this.userService.findOne(id);
+      if (res?.id) {
+        res.headerImg = `http://127.0.0.1:${configYml.PORT}${configYml.PREFIX}${afterUploadingPath}`;
+        return this.userService.update(id, res);
+      }
     }
-    return '';
+
+    // 如果没有找到用户，返回空字符串
+    return `http://127.0.0.1:${configYml.PORT}${configYml.PREFIX}${afterUploadingPath}`;
   }
 
   async messageFileSave(toUserId: number, fromUserId: number, file: Express.Multer.File, msgType: ChatType) {

@@ -29,7 +29,7 @@ export class UserService {
       .getMany();
     return {
       content,
-      totalElements: Math.ceil(count / limit),
+      totalElements: count,
       totalPages: Number(page || 1),
     } as unknown;
   }
@@ -65,6 +65,28 @@ export class UserService {
       throw new BadRequestException('密码不正确');
     }
     throw new BadRequestException('用户不存在');
+  }
+
+  async resetPassword(id: number) {
+    const res = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (res?.id) {
+      res.password = encrypt('123456');
+      return this.userRepository.save(res);
+    }
+  }
+
+  async blackUser(id: number) {
+    const res = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    res.isBlack = !res.isBlack;
+    return this.userRepository.save(res);
   }
 
   async remove(id: number) {
