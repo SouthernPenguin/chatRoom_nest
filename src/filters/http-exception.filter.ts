@@ -1,9 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch(HttpException)
@@ -13,8 +8,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response: Response = ctx.getResponse();
     const status = exception.getStatus();
 
-    const message =
-      status >= 500 ? 'Internal server error' : exception['response'].message;
+    const message = status >= 500 ? 'Internal server error' : exception['response'].message;
 
     const errorResponse = {
       code: status,
