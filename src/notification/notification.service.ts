@@ -59,11 +59,11 @@ export class NotificationService {
           id,
           state: 'DELETE',
         })
-        .orWhere(
+        .andWhere(
           'notice.fromUserId IN ( SELECT userId FROM group_chat_user WHERE group_chat_user.groupChatId = notice.groupId ) ',
         )
         .getMany();
-      return await this.friendShipService.selectUnreadNumber(res, id);
+      return res;
     } catch (error) {
       throw new ServiceUnavailableException(error);
     }

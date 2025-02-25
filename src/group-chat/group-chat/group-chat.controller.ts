@@ -1,14 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Req, UseFilters } from '@nestjs/common';
-import { GroupChatService } from './group-chat.service';
 
-import { CreateGroupChatDto } from './dto/create-group-chat.dto';
-import { UpdateGroupChatDto } from './dto/update-group-chat.dto';
+import { CreateGroupChatDto } from '../dto/create-group-chat.dto';
+import { UpdateGroupChatDto } from '../dto/update-group-chat.dto';
 import { getTokenUser } from 'src/utils';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { TypeormFilter } from 'src/filters/typeorm.filter';
-import { CreatedGroupChatPipe } from './pipe/created-group-chat/created-group-chat.pipe';
-import { GroupChatUserService } from './group-chat-user.service';
+import { CreatedGroupChatPipe } from '../pipe/created-group-chat/created-group-chat.pipe';
+import { GroupChatUserService } from '../group-chat-user/group-chat-user.service';
+import { GroupChatService } from './group-chat.service';
 
 @Controller('group-chat')
 @UseFilters(HttpExceptionFilter, TypeormFilter)

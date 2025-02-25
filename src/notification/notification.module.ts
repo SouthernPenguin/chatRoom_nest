@@ -8,11 +8,7 @@ import { GroupChatUser } from 'src/group-chat/entities/group-chat-user.entity';
 import { FriendShipModule } from 'src/friend-ship/friend-ship.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Notice, GroupChatUser]),
-    FriendShipModule,
-    WsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Notice, GroupChatUser]), FriendShipModule, WsModule],
   controllers: [NotificationController],
   providers: [NotificationService],
   exports: [NotificationService],

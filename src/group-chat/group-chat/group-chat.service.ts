@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateGroupChatDto } from './dto/create-group-chat.dto';
-import { UpdateGroupChatDto } from './dto/update-group-chat.dto';
+import { Injectable } from '@nestjs/common';
+import { CreateGroupChatDto } from '../dto/create-group-chat.dto';
+import { UpdateGroupChatDto } from '../dto/update-group-chat.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GroupChat } from './entities/group-chat.entity';
+import { GroupChat } from '../entities/group-chat.entity';
 import { Repository } from 'typeorm';
 import { UserAuthService } from 'src/user/userAuth.service';
-import { GroupChatUserService } from './group-chat-user.service';
+import { GroupChatUserService } from '../group-chat-user/group-chat-user.service';
 
 @Injectable()
 export class GroupChatService {

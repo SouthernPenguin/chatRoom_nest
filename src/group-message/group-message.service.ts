@@ -5,10 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MessageEnum } from 'src/enum';
 import { ListGroupMessageDto } from './dto/list-group-message.dto';
-import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
+import { GroupChatUserService } from 'src/group-chat/group-chat-user/group-chat-user.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { RedisService } from 'src/redis/redis.service';
-import { GroupChatService } from 'src/group-chat/group-chat.service';
+import { GroupChatService } from 'src/group-chat/group-chat/group-chat.service';
 import { EnterExitTime } from 'src/group-chat/dto/enter-exit-time.dto';
 
 @Injectable()

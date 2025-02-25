@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GroupChatController } from '../group-chat.controller';
-import { GroupChatService } from '../group-chat.service';
+import { GroupChatController } from '../group-chat/group-chat.controller';
+import { GroupChatService } from '../group-chat/group-chat.service';
 
 describe('GroupChatController', () => {
   let controller: GroupChatController;

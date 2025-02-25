@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsNumber, Validate } from 'class-validator';
+import { IsNotEmpty, IsNumber, Validate } from 'class-validator';
 import { DateRules } from 'src/rules/DeteRules';
 export class EnterExitTime {
   @IsNumber()

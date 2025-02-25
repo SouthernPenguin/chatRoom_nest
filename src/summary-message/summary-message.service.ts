@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendShip } from 'src/friend-ship/entities/friend-ship.entity';
 import { FriendShipService } from 'src/friend-ship/friend-ship.service';
-import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
+import { GroupChatUserService } from 'src/group-chat/group-chat-user/group-chat-user.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 

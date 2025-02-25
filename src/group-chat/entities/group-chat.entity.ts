@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { GroupChatUser } from './group-chat-user.entity';
+import { GroupMessage } from 'src/group-message/entities/group-message.entity';
 
 // 群聊
 @Entity()
@@ -34,9 +35,8 @@ export class GroupChat {
   })
   users: User[];
 
-  // @OneToMany(
-  //   () => GroupChatUser,
-  //   (userBusinessLine) => userBusinessLine.groupChat,
-  // )
+  @OneToMany(() => GroupMessage, groupMessge => groupMessge.groupId, { cascade: ['recover'] })
+  groupMessage: GroupMessage[];
+  // @OneToMany(() => GroupChatUser, userBusinessLine => userBusinessLine.groupChatId, { cascade: ['recover'] })
   // groupChatUser: GroupChatUser[];
 }

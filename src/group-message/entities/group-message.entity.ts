@@ -36,7 +36,7 @@ export class GroupMessage {
   })
   groupId: number;
   // 外键
-  @ManyToOne(() => GroupChat, groupChat => groupChat.id, { eager: true })
+  @ManyToOne(() => GroupChat, groupChat => groupChat.id, { eager: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'groupId' })
   toUsers: GroupChat;
 

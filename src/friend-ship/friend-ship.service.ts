@@ -7,8 +7,8 @@ import { In, Repository } from 'typeorm';
 import { ChatType, FriendShipEnum } from 'src/enum';
 import { UserService } from 'src/user/user.service';
 import { Notice } from 'src/notification/entities/notice.entity';
-import { GroupChatUserService } from 'src/group-chat/group-chat-user.service';
 import { GetFriendDto } from './dto/select-friend-ship';
+import { GroupChatUserService } from 'src/group-chat/group-chat-user/group-chat-user.service';
 
 @Injectable()
 export class FriendShipService {

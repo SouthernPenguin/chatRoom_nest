@@ -1,10 +1,10 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { GroupChatUser } from './entities/group-chat-user.entity';
+import { GroupChatUser } from '../entities/group-chat-user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EnterExitTime } from './dto/enter-exit-time.dto';
-import { GroupChat } from './entities/group-chat.entity';
-import { UserService } from './../user/user.service';
+import { EnterExitTime } from '../dto/enter-exit-time.dto';
+import { GroupChat } from '../entities/group-chat.entity';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class GroupChatUserService {
