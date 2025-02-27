@@ -1,9 +1,4 @@
-import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer } from '@nestjs/websockets';
 import { WsService } from './ws.service';
 import { CreateWDto } from './dto/create-w.dto';
 import { UpdateWDto } from './dto/update-w.dto';
