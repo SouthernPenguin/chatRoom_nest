@@ -47,3 +47,14 @@
 + Node版本：v18以上
 
 ### 后续应该会继续完善
+
+
+### GitHub地址
++ 服务端：https://github.com/SouthernPenguin/chatRoom_nest
++ 后台管理系统：https://github.com/SouthernPenguin/next-chatRoom-admin
++ 客户端：https://github.com/SouthernPenguin/chat-room
+
+### Gitee地址
++ 服务端：https://gitee.com/maskpeople/chatRoom_nest
++ 后台管理系统：https://gitee.com/maskpeople/next-chatRoom-admin
++ 客户端：https://gitee.com/maskpeople/chat-room
