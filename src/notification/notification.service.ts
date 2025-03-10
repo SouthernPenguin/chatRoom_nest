@@ -49,20 +49,38 @@ export class NotificationService {
   // 当前用户消息列表
   async findOne(id: number) {
     try {
-      const res = await this.notificationService
-        .createQueryBuilder('notice')
-        .addOrderBy('updateTime', 'DESC')
-        .leftJoinAndSelect('notice.toUser', 'toUser')
-        .leftJoinAndSelect('notice.fromUser', 'fromUser')
-        .leftJoinAndSelect('notice.toUsers', 'toUsers')
-        .where('(notice.fromUserId = :id or notice.toUserId = :id) and state != :state', {
-          id,
-          state: 'DELETE',
-        })
-        .andWhere(
-          'notice.fromUserId IN ( SELECT userId FROM group_chat_user WHERE group_chat_user.groupChatId = notice.groupId ) ',
-        )
-        .getMany();
+      const res = await this.notificationService.query(`
+        SELECT
+          notice.*,
+
+          formUser.name AS formUserName,
+          formUser.headerImg as formUserHeaderImg,
+          formUser.nickname as formUserNickname,
+
+          toUser.name AS toUserName,
+          toUser.headerImg as toUserHeaderImg,
+          toUser.nickname as toUserNickname,
+
+          toUsers.name AS toUsersName
+        FROM
+          notice
+          LEFT JOIN user AS formUser ON formUser.id = notice.fromUserId
+          AND notice.state
+          LEFT JOIN user AS toUser ON toUser.id = notice.toUserId
+          LEFT JOIN group_chat AS toUsers ON toUsers.id = notice.groupId
+          LEFT JOIN group_chat_user ON group_chat_user.groupChatId = notice.groupId
+          AND group_chat_user.userId = ${id}
+        WHERE
+          (
+            (
+              notice.msgType = 'ONE_FOR_ONE'
+            AND ( notice.fromUserId = ${id}  OR notice.toUserId = ${id}  ))
+            OR ( notice.msgType = 'MANY_TO_MANY' AND group_chat_user.userId IS NOT NULL )
+          )
+          AND notice.state <> 'DELETE'
+        ORDER BY
+          notice.updateTime DESC
+      `);
       return res;
     } catch (error) {
       throw new ServiceUnavailableException(error);
